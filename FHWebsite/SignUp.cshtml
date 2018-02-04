@@ -80,23 +80,19 @@
         @using System.Data.SqlClient;
         @using System.Data;
         @{
-            var userID = "";
-            var lunch = "";
-            var dinner = "";
-            var date = "";
-            var qty = "";
-            
+            string[] dataColumns = { "UserID", "Lunch", "Dinner", "Date", "LQty", "DQty" };
+            string[] userInputs = new string[6];
 
             if (IsPost)
             {
                 SqlConnection db = new SqlConnection("Data Source=192.168.0.15;Initial Catalog=FH;Persist Security Info=True;User ID=sa;Password=Admin123");
                 SqlCommand cmd;
-                //db.Open();
-                userID = Request.Form["userID"];
-                lunch = Request.Form["lunch"];
-                dinner = Request.Form["dinner"];
-                date = Request.Form["date"];
-                qty = Request.Form["qty"];
+
+                // Prep user inputs
+                for (int i = 0; i < dataColumns.Length; i++)
+                {
+                    userInputs[i] = Request.Form[dataColumns[i]];
+                }
 
                 // Command to insert a meal signup into Meals Table
                 string insertCommand = @"INSERT INTO [dbo].[Meals]
@@ -104,29 +100,34 @@
                                            ,[Date]
                                            ,[Lunch]
                                            ,[Dinner]
-                                           ,[Qty])
+                                           ,[LQty]
+                                           ,[DQty])
                                      VALUES
-                                           (@ID
+                                           (@UserID
                                            ,@Date
                                            ,@Lunch
                                            ,@Dinner
-                                           ,@Qty)";
+                                           ,@LQty
+                                           ,@DQty)";
 
                 cmd = new SqlCommand(insertCommand, db);
 
                 // Parameterize the command
-                cmd.Parameters.Add("@ID", SqlDbType.Int);
+                cmd.Parameters.Add("@UserID", SqlDbType.Int);
                 cmd.Parameters.Add("@Date", SqlDbType.Date);
                 cmd.Parameters.Add("@Lunch", SqlDbType.NChar);
                 cmd.Parameters.Add("@Dinner", SqlDbType.NChar);
-                cmd.Parameters.Add("@Qty", SqlDbType.Int);
+                cmd.Parameters.Add("@DQty", SqlDbType.Int);
+                cmd.Parameters.Add("@LQty", SqlDbType.Int);
 
                 // Give the parameters values
-                cmd.Parameters["@ID"].Value = Int32.Parse(userID);
-                cmd.Parameters["@Date"].Value = date;
-                cmd.Parameters["@Lunch"].Value = lunch;
-                cmd.Parameters["@Dinner"].Value = dinner;
-                cmd.Parameters["@Qty"].Value = qty;
+                cmd.Parameters["@UserID"].Value = Int32.Parse(userInputs[0]);
+                for (int i=1; i < dataColumns.Length; i++)
+                {
+                    cmd.Parameters["@" + dataColumns[i]].Value = userInputs[i];
+                }
+
+                // Connect to database and execute query.
                 try
                 {
                     db.Open();
@@ -137,9 +138,6 @@
                 {
                     msg = "<h3 class=\"message\">Something went wrong</hr><p>" + e.Message + "</p>";
                 }
-
-                //var insertCommand = "INSERT INTO Movies (Title, Genre, Year) Values(@0, @1, @2)";
-                //db.Execute(insertCommand, title, genre, year);
 
             }
         }
@@ -153,23 +151,26 @@
                 Lunch:&nbsp;
                 <select name="lunch">
                     <option value="LI">In</option>
+                    <option value="LO">Out</option>
                     <option value="LE">Early</option>
                     <option value="LL">Late</option>
-                </select>
+                    <option value="LN">Late (NOS)</option>
+                </select>&nbsp;
+                Quantity:&nbsp; <input type="number" name="lqty" value="1" />
             </p>
             <p>
                 Dinner:&nbsp;
                 <select name="dinner">
                     <option value="DI">In</option>
+                    <option value="DO">Out</option>
                     <option value="DE">Early</option>
                     <option value="DL">Late</option>
-                </select>
+                    <option value="LN">Late (NOS)</option>
+                </select>&nbsp;
+                Quantity:&nbsp; <input type="number" name="dqty" value="1" />
             </p>
             <p>
                 Date:&nbsp; <input type="date" name="date" />
-            </p>
-            <p>
-                Quantity:&nbsp; <input type="number" name="qty" value="1"/>
             </p>
             <input type="submit" name="submit" value="Submit" />
         </div>
