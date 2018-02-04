@@ -13,13 +13,12 @@
         @using FHWebsite;
         @{
             string[] dataColumns = { "UserID", "Lunch", "Dinner", "Date", "LQty", "DQty" };
-            SqlDbType[] dataTypes = { SqlDbType.Int, SqlDbType.Date, SqlDbType.NChar, SqlDbType.NChar, SqlDbType.Int, SqlDbType.Int };
+            SqlDbType[] dataTypes = { SqlDbType.Int, SqlDbType.NChar, SqlDbType.NChar, SqlDbType.Date, SqlDbType.TinyInt, SqlDbType.TinyInt };
             string[] userInputs = new string[6];
+            string connection = System.Configuration.ConfigurationManager.AppSettings["FHConnectionString"];
 
             if (IsPost)
             {
-                string connection = "Data Source=192.168.0.15;Initial Catalog=FH;Persist Security Info=True;User ID=sa;Password=Admin123";
-                SqlCommand cmd;
 
                 // Get user inputs
                 for (int i = 0; i < dataColumns.Length; i++)

@@ -30,15 +30,15 @@ namespace FHWebsite
                 command.Parameters[parameters[i]].Value = paramValues[i];
             }
 
-            try
-            {
+            //try
+            //{
                 db.Open();
                 return command.ExecuteNonQuery();
-            }
-            catch
-            {
-                return 0;
-            }
+            //}
+            //catch
+            //{
+            //    return 0;
+            //}
         }
     }
 }
