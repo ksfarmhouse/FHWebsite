@@ -4,91 +4,24 @@
 @{ string msg = "";}
 <head runat="server">
     <title>FH Meal Sign Up</title>
-    <style type="text/css">
-        #background {
-            background-color: #006938;
-        }
-
-        .box {
-            width: 400px;
-            height: 400px;
-            font-family: Helvetica, Arial, sans-serif;
-            background-color: white;
-            padding: 2px 20px 2px 20px;
-            color: #000;
-            position: absolute;
-            top: 0;
-            right: 0;
-            left: 0;
-            bottom: 0;
-            margin: auto;
-            border-width: 5px;
-            border-style: solid;
-            border-color: #ffce00;
-            border-radius: 15px;
-            box-shadow: rgba(0,0,0, .75) 0px 0px 20px, rgba(0,0,0, .75) 0px 0px 5px inset;
-            max-width: 100%;
-            max-height: 100%;
-            overflow: auto;
-        }
-
-        .box h1 {
-            color: #006938;
-            text-align: center;
-        }
-
-        .box input[type=date] {
-            width: 124px;
-        }
-
-        .box input[type=number] {
-            width: 25px;
-        }
-
-        .box input[type=submit] {
-            background-color: #006938;
-            font-size: 18px;
-            font-weight: 600;
-            color: #ffce00;
-            border-radius: 2px;
-            border: 1px solid #006938;
-            box-shadow: rgba(0,0,0,.75) 0px 0px 4px;
-        }
-
-        .box input[type=submit]:hover {
-            background-color: #006938;
-            color: white;
-        }
-
-        .message {
-            background-color: #ffce00;
-            color: #54575a;
-            box-shadow: rgba(0,0,0,.75) 0px 0px 5px;
-            text-align: center;
-            border-radius: 8px;
-            width: 100%;
-            height: 20px;
-        }
-
-        ::-webkit-scrollbar {
-            display: none;
-        }
-    </style>
+    <link rel="stylesheet" href="FhStyle.css">
 </head>
 <body id="background">
     <form id="form1" runat="server" method="post">
         @using System.Data.SqlClient;
         @using System.Data;
+        @using FHWebsite;
         @{
             string[] dataColumns = { "UserID", "Lunch", "Dinner", "Date", "LQty", "DQty" };
+            SqlDbType[] dataTypes = { SqlDbType.Int, SqlDbType.Date, SqlDbType.NChar, SqlDbType.NChar, SqlDbType.Int, SqlDbType.Int };
             string[] userInputs = new string[6];
 
             if (IsPost)
             {
-                SqlConnection db = new SqlConnection("Data Source=192.168.0.15;Initial Catalog=FH;Persist Security Info=True;User ID=sa;Password=Admin123");
+                string connection = "Data Source=192.168.0.15;Initial Catalog=FH;Persist Security Info=True;User ID=sa;Password=Admin123";
                 SqlCommand cmd;
 
-                // Prep user inputs
+                // Get user inputs
                 for (int i = 0; i < dataColumns.Length; i++)
                 {
                     userInputs[i] = Request.Form[dataColumns[i]];
@@ -110,10 +43,19 @@
                                            ,@LQty
                                            ,@DQty)";
 
-                cmd = new SqlCommand(insertCommand, db);
+                if (SqlTools.ExecuteNonQuery(connection, insertCommand, dataColumns, dataTypes, userInputs) > 0)
+                {
+                    msg = "<h3 class=\"message\">Entry submitted</h3>";
+                }
+                else
+                {
+                    msg = "<h3 class=\"message\">Something went wrong</h3>";
+                }
+
+                //cmd = new SqlCommand(insertCommand, db);
 
                 // Parameterize the command
-                cmd.Parameters.Add("@UserID", SqlDbType.Int);
+                /*cmd.Parameters.Add("@UserID", SqlDbType.Int);
                 cmd.Parameters.Add("@Date", SqlDbType.Date);
                 cmd.Parameters.Add("@Lunch", SqlDbType.NChar);
                 cmd.Parameters.Add("@Dinner", SqlDbType.NChar);
@@ -121,7 +63,7 @@
                 cmd.Parameters.Add("@LQty", SqlDbType.Int);
 
                 // Give the parameters values
-                cmd.Parameters["@UserID"].Value = Int32.Parse(userInputs[0]);
+                cmd.Parameters["@UserID"].Value = userInputs[0];
                 for (int i=1; i < dataColumns.Length; i++)
                 {
                     cmd.Parameters["@" + dataColumns[i]].Value = userInputs[i];
@@ -136,8 +78,8 @@
                 }
                 catch (Exception e)
                 {
-                    msg = "<h3 class=\"message\">Something went wrong</hr><p>" + e.Message + "</p>";
-                }
+                    msg = "<h3 class=\"message\">Something went wrong</h3><p>" + e.Message + "</p>";
+                }*/
 
             }
         }
