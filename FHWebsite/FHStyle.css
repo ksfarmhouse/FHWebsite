@@ -9,7 +9,7 @@ table, th, td {
     border-collapse: collapse;
 }
 
-h3 {
+table h3 {
     padding: 0px;
     margin: 2px;
 }

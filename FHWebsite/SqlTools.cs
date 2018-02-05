@@ -56,7 +56,7 @@ namespace FHWebsite
             SqlConnection db = new SqlConnection(con);
             SqlCommand command = new SqlCommand(cmd, db);
 
-            BuildCommand(command, parameters, paramTypes, paramValues);
+            command = BuildCommand(command, parameters, paramTypes, paramValues);
 
             db.Open();
             return command.ExecuteReader();

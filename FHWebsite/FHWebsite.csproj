@@ -161,6 +161,7 @@
       <DependentUpon>FHDataSet.xsd</DependentUpon>
     </Content>
     <Content Include="Crew.cshtml" />
+    <Content Include="Cook.cshtml" />
     <None Include="FHDataSet.xsd">
       <Generator>MSDataSetGenerator</Generator>
       <LastGenOutput>FHDataSet.Designer.cs</LastGenOutput>
