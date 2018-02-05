@@ -4,7 +4,63 @@
     <title>Late Plates</title>
     <link rel="stylesheet" href="FhStyle.css" />
 </head>
-<body>
-    
+<body id="background">
+    @using FHWebsite;
+    @using System.Data.SqlClient;
+    @using System.Data;
+    @using System.Text;
+    @{ 
+        string connection = System.Configuration.ConfigurationManager.ConnectionStrings["FHConnectionString"].ConnectionString;
+        string cmd = @"SELECT [FirstName]
+	                          ,[LastName]
+	                          ,[Lunch]
+                        FROM [dbo].[Meals] JOIN [dbo].[Members]
+                        ON [dbo].[Meals].UserID = [dbo].[Members].ID
+                        WHERE (Lunch = 'LL' OR Lunch = 'LN') AND Date = CAST(GETDATE() AS DATE)";
+        SqlDataReader lunch = SqlTools.ExecuteQuery(connection, cmd, new string[] { }, new SqlDbType[] { }, new string[] { });
+        cmd = @"SELECT [FirstName]
+	                    ,[LastName]
+	                    ,[Lunch]
+                FROM [dbo].[Meals] JOIN [dbo].[Members]
+                ON [dbo].[Meals].UserID = [dbo].[Members].ID
+                WHERE (Lunch = 'LL' OR Lunch = 'LN') AND Date = CAST(GETDATE() AS DATE)";
+        SqlDataReader dinner = SqlTools.ExecuteQuery(connection, cmd, new string[] { }, new SqlDbType[] { }, new string[] { });
+    }
+    @functions{
+        /// <summary>
+        /// Write data to a table
+        /// </summary>
+        /// <param name="data">Data to write</param>
+        string FormatData(SqlDataReader data)
+        {
+            string nos;
+            StringBuilder ret = new StringBuilder();
+            while (data.Read())
+            {
+                if ((string)data.GetValue(2) == "LN")
+                    nos = "NOS";
+                else
+                    nos = "";
+                ret.AppendFormat("<tr><td>{0} {1}</td><td>{2}</td></tr>", data.GetValue(0), data.GetValue(1), nos);
+            }
+            return ret.ToString();
+        }
+    }
+    <div class="box">
+        <h1>Lunch Late Plates</h1>
+        <table>
+            <tr>
+                <th><h3>Name</h3></th><th><h3>NOS</h3></th>
+            </tr>
+            @{WriteLiteral(FormatData(lunch));}
+        </table>
+        <h1>Dinner Late Plates</h1>
+        <table>
+            <tr>
+                <th><h3>Name</h3></th><th><h3>NOS</h3></th>
+            </tr>
+            @{WriteLiteral(FormatData(dinner));}
+        </table>
+    </div>
 </body>
 </html>

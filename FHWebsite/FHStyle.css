@@ -2,9 +2,16 @@
     background-color: #006938;
 }
 
-table, th, tr {
-    border: solid 2px #006938;
-    padding: 2px;
+table, th, td {
+    border: solid 3px #006938;
+    padding: 3px;
+    margin: auto;
+    border-collapse: collapse;
+}
+
+h3 {
+    padding: 0px;
+    margin: 2px;
 }
 
 .box {
@@ -30,33 +37,33 @@ table, th, tr {
     overflow: auto;
 }
 
-    .box h1 {
-        color: #006938;
-        text-align: center;
-    }
+.box h1 {
+    color: #006938;
+    text-align: center;
+}
 
-    .box input[type=date] {
-        width: 124px;
-    }
+.box input[type=date] {
+    width: 124px;
+}
 
-    .box input[type=number] {
-        width: 25px;
-    }
+.box input[type=number] {
+    width: 25px;
+}
 
-    .box input[type=submit] {
-        background-color: #006938;
-        font-size: 18px;
-        font-weight: 600;
-        color: #ffce00;
-        border-radius: 2px;
-        border: 1px solid #006938;
-        box-shadow: rgba(0,0,0,.75) 0px 0px 4px;
-    }
+.box input[type=submit] {
+    background-color: #006938;
+    font-size: 18px;
+    font-weight: 600;
+    color: #ffce00;
+    border-radius: 2px;
+    border: 1px solid #006938;
+    box-shadow: rgba(0,0,0,.75) 0px 0px 4px;
+}
 
-        .box input[type=submit]:hover {
-            background-color: #006938;
-            color: white;
-        }
+.box input[type=submit]:hover {
+    background-color: #006938;
+    color: white;
+}
 
 .message {
     background-color: #ffce00;

@@ -15,7 +15,7 @@
             string[] dataColumns = { "UserID", "Lunch", "Dinner", "Date", "LQty", "DQty" };
             SqlDbType[] dataTypes = { SqlDbType.Int, SqlDbType.NChar, SqlDbType.NChar, SqlDbType.Date, SqlDbType.TinyInt, SqlDbType.TinyInt };
             string[] userInputs = new string[6];
-            string connection = System.Configuration.ConfigurationManager.AppSettings["FHConnectionString"];
+            string connection = System.Configuration.ConfigurationManager.ConnectionStrings["FHConnectionString"].ConnectionString;
 
             if (IsPost)
             {
@@ -50,36 +50,6 @@
                 {
                     msg = "<h3 class=\"message\">Something went wrong</h3>";
                 }
-
-                //cmd = new SqlCommand(insertCommand, db);
-
-                // Parameterize the command
-                /*cmd.Parameters.Add("@UserID", SqlDbType.Int);
-                cmd.Parameters.Add("@Date", SqlDbType.Date);
-                cmd.Parameters.Add("@Lunch", SqlDbType.NChar);
-                cmd.Parameters.Add("@Dinner", SqlDbType.NChar);
-                cmd.Parameters.Add("@DQty", SqlDbType.Int);
-                cmd.Parameters.Add("@LQty", SqlDbType.Int);
-
-                // Give the parameters values
-                cmd.Parameters["@UserID"].Value = userInputs[0];
-                for (int i=1; i < dataColumns.Length; i++)
-                {
-                    cmd.Parameters["@" + dataColumns[i]].Value = userInputs[i];
-                }
-
-                // Connect to database and execute query.
-                try
-                {
-                    db.Open();
-                    Int32 rowsAffected = cmd.ExecuteNonQuery();
-                    msg = "<h3 class=\"message\">Entry submitted</h3>";
-                }
-                catch (Exception e)
-                {
-                    msg = "<h3 class=\"message\">Something went wrong</h3><p>" + e.Message + "</p>";
-                }*/
-
             }
         }
         <div class="box">
@@ -91,6 +61,7 @@
             <p>
                 Lunch:&nbsp;
                 <select name="lunch">
+                    <option value="">No Change</option>
                     <option value="LI">In</option>
                     <option value="LO">Out</option>
                     <option value="LE">Early</option>
@@ -102,6 +73,7 @@
             <p>
                 Dinner:&nbsp;
                 <select name="dinner">
+                    <option value="">No Change</option>
                     <option value="DI">In</option>
                     <option value="DO">Out</option>
                     <option value="DE">Early</option>
@@ -111,7 +83,10 @@
                 Quantity:&nbsp; <input type="number" name="dqty" value="1" />
             </p>
             <p>
-                Date:&nbsp; <input type="date" name="date" />
+                Date:&nbsp; 
+                @{
+                    WriteLiteral("<input type=\"date\" name=\"date\" value=\"" + DateTime.Today.ToString("yyyy-MM-dd") + "\" />");
+                }
             </p>
             <input type="submit" name="submit" value="Submit" />
         </div>
