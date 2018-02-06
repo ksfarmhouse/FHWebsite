@@ -20,10 +20,10 @@
         SqlDataReader lunch = SqlTools.ExecuteQuery(connection, cmd, new string[] { }, new SqlDbType[] { }, new string[] { });
         cmd = @"SELECT [FirstName]
 	                    ,[LastName]
-	                    ,[Lunch]
+	                    ,[Dinner]
                 FROM [dbo].[Meals] JOIN [dbo].[Members]
                 ON [dbo].[Meals].UserID = [dbo].[Members].ID
-                WHERE (Lunch = 'LL' OR Lunch = 'LN') AND Date = CAST(GETDATE() AS DATE)";
+                WHERE (Lunch = 'DL' OR Lunch = 'LN') AND Date = CAST(GETDATE() AS DATE)";
         SqlDataReader dinner = SqlTools.ExecuteQuery(connection, cmd, new string[] { }, new SqlDbType[] { }, new string[] { });
     }
     @functions{
