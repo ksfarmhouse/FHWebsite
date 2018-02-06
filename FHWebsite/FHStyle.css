@@ -1,6 +1,5 @@
 ﻿#background {
     background-color: #006938;
-    /*text-align: center;*/
     height: 100%;
 }
 
@@ -75,6 +74,25 @@ table h3 {
 .box input[type=submit]:hover {
     background-color: #006938;
     color: white;
+}
+
+#navigation{
+    text-align: center;
+    padding: 10px;
+}
+
+#navigation h3 {
+    margin: 2px;
+    color: #006938;
+}
+
+#navigation a{
+    color: #006938;
+    text-decoration: none;
+}
+
+#navigation a:hover{
+    color: #ffce00;
 }
 
 .message {

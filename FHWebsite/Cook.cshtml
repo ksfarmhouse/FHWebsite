@@ -73,6 +73,8 @@
             return values;
         }
     }
+    <!--Navigation Bar-->
+    @Html.Raw(File.ReadAllText(Server.MapPath("Header.html")))
     <div class="box">
         <form style="text-align:center;" id="form1" runat="server" method="post">
             <h3>

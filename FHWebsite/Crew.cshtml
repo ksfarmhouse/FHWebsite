@@ -46,6 +46,8 @@
             return ret.ToString();
         }
     }
+    <!--Navigation Bar-->
+    @Html.Raw(File.ReadAllText(Server.MapPath("Header.html")))
     <div class="box">
         <h1>Lunch Late Plates</h1>
         <table>

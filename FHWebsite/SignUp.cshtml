@@ -61,6 +61,8 @@
                 }
             }
         }
+        <!--Navigation Bar-->
+        @Html.Raw(File.ReadAllText(Server.MapPath("Header.html")))
         <div class="box">
             <h1>FarmHouse Meal Sign Up</h1>
             @{WriteLiteral(msg);}
