@@ -211,6 +211,7 @@
     <Content Include="Bundle.config" />
     <Content Include="Site.Mobile.Master" />
     <Content Include="SignUp.cshtml" />
+    <Content Include="Weekly.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\BundleConfig.cs" />

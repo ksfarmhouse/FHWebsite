@@ -1,0 +1,28 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Weekly Sign Ups</title>
+    <link rel="stylesheet" href="FhStyle.css" />
+</head>
+<body id="background">
+    @using System.Data;
+    @using System.Data.SqlClient;
+    @using FHWebsite;
+    @{ 
+        string userID = "";
+        string buttonText = "Log In";
+        if (IsPost)
+        {
+            
+        }
+    }
+    @functions{
+    }
+    @Html.Raw(File.ReadAllText(Server.MapPath("Header.html")))
+    <div class="box">
+        <form id="form1" method="post">
+            <h3>User ID: <input type="text" name="UserID" size="2" value="@(userID)"/><input type="submit" name="submit" value="@(buttonText)" /></h3>
+        </form>
+    </div>
+</body>
+</html>

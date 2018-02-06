@@ -12,22 +12,24 @@
         @using System.Data;
         @using FHWebsite;
         @{
-                    string[] dataColumns = { "UserID", "Lunch", "Dinner", "Date", "LQty", "DQty" };
-                    SqlDbType[] dataTypes = { SqlDbType.Int, SqlDbType.NChar, SqlDbType.NChar, SqlDbType.Date, SqlDbType.TinyInt, SqlDbType.TinyInt };
-                    string[] userInputs = new string[6];
-                    string connection = System.Configuration.ConfigurationManager.ConnectionStrings["FHConnectionString"].ConnectionString;
+            string[] dataColumns = { "UserID", "Lunch", "Dinner", "Date", "LQty", "DQty" };
+            SqlDbType[] dataTypes = { SqlDbType.Int, SqlDbType.NChar, SqlDbType.NChar, SqlDbType.Date, SqlDbType.TinyInt, SqlDbType.TinyInt };
+            string[] userInputs = new string[6];
+            string connection = System.Configuration.ConfigurationManager.ConnectionStrings["FHConnectionString"].ConnectionString;
+            bool isValidId;
 
-                    if (IsPost)
-                    {
+            if (IsPost)
+            {
+                // Get user inputs
+                for (int i = 0; i < dataColumns.Length; i++)
+                {
+                    userInputs[i] = Request.Form[dataColumns[i]];
+                }
 
-                        // Get user inputs
-                        for (int i = 0; i < dataColumns.Length; i++)
-                        {
-                            userInputs[i] = Request.Form[dataColumns[i]];
-                        }
+                // Check if the entered ID is valid
+                isValidId = (SqlTools.ExecuteNonQuery(connection, "SELECT [ID] FROM [FH].[dbo].[Members] WHERE [ID] = @ID", new string[] { "@ID" }, new SqlDbType[] { SqlDbType.Int }, new string[] { userInputs[0] }) > 0);
 
-                        // Command to insert a meal signup into Meals Table
-                        string insertCommand = @"UPDATE[dbo].[Meals]
+                string insertCommand = @"UPDATE[dbo].[Meals]
                                                 SET[UserID] = @UserID
                                                     ,[Date] = @Date
                                                     ,[Dinner] = ISNULL(NULLIF(@Dinner,''), Dinner)
@@ -51,14 +53,23 @@
                                                            ,@LQty
                                                            ,@DQty)";
 
-                if (SqlTools.ExecuteNonQuery(connection, insertCommand, dataColumns, dataTypes, userInputs) > 0)
+                // Provide output message
+                if (isValidId)
                 {
-                    msg = "<h3 class=\"message\">Entry submitted</h3>";
+                    if (SqlTools.ExecuteNonQuery(connection, insertCommand, dataColumns, dataTypes, userInputs) > 0)
+                    {
+                        msg = "<h3 class=\"message\">Entry submitted</h3>";
+                    }
+                    else
+                    {
+                        msg = "<h3 class=\"message\">Something went wrong</h3>";
+                    }
                 }
                 else
                 {
-                    msg = "<h3 class=\"message\">Something went wrong</h3>";
+                    msg = "<h3 class=\"message\">" + userInputs[0] + " is not a current User ID.</h3>";
                 }
+
             }
         }
         <!--Navigation Bar-->
