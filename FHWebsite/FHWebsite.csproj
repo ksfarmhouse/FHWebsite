@@ -170,6 +170,7 @@
     <Content Include="FHDataSet.xss">
       <DependentUpon>FHDataSet.xsd</DependentUpon>
     </Content>
+    <Content Include="MealCount.cshtml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Meals.aspx" />
     <Content Include="Scripts\bootstrap.js" />

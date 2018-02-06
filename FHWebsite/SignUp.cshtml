@@ -12,35 +12,44 @@
         @using System.Data;
         @using FHWebsite;
         @{
-            string[] dataColumns = { "UserID", "Lunch", "Dinner", "Date", "LQty", "DQty" };
-            SqlDbType[] dataTypes = { SqlDbType.Int, SqlDbType.NChar, SqlDbType.NChar, SqlDbType.Date, SqlDbType.TinyInt, SqlDbType.TinyInt };
-            string[] userInputs = new string[6];
-            string connection = System.Configuration.ConfigurationManager.ConnectionStrings["FHConnectionString"].ConnectionString;
+                    string[] dataColumns = { "UserID", "Lunch", "Dinner", "Date", "LQty", "DQty" };
+                    SqlDbType[] dataTypes = { SqlDbType.Int, SqlDbType.NChar, SqlDbType.NChar, SqlDbType.Date, SqlDbType.TinyInt, SqlDbType.TinyInt };
+                    string[] userInputs = new string[6];
+                    string connection = System.Configuration.ConfigurationManager.ConnectionStrings["FHConnectionString"].ConnectionString;
 
-            if (IsPost)
-            {
+                    if (IsPost)
+                    {
 
-                // Get user inputs
-                for (int i = 0; i < dataColumns.Length; i++)
-                {
-                    userInputs[i] = Request.Form[dataColumns[i]];
-                }
+                        // Get user inputs
+                        for (int i = 0; i < dataColumns.Length; i++)
+                        {
+                            userInputs[i] = Request.Form[dataColumns[i]];
+                        }
 
-                // Command to insert a meal signup into Meals Table
-                string insertCommand = @"INSERT INTO [dbo].[Meals]
-                                           ([UserID]
-                                           ,[Date]
-                                           ,[Lunch]
-                                           ,[Dinner]
-                                           ,[LQty]
-                                           ,[DQty])
-                                     VALUES
-                                           (@UserID
-                                           ,@Date
-                                           ,@Lunch
-                                           ,@Dinner
-                                           ,@LQty
-                                           ,@DQty)";
+                        // Command to insert a meal signup into Meals Table
+                        string insertCommand = @"UPDATE[dbo].[Meals]
+                                                SET[UserID] = @UserID
+                                                    ,[Date] = @Date
+                                                    ,[Dinner] = ISNULL(NULLIF(@Dinner,''), Dinner)
+                                                    ,[Lunch] = ISNULL(NULLIF(@Lunch,''), Lunch)
+                                                    ,[LQty] = @LQty
+                                                    ,[DQty] = @DQty
+                                                 WHERE UserID = @UserID AND [Date] = @Date
+                                                 IF @@ROWCOUNT=0
+	                                                INSERT INTO [dbo].[Meals]
+                                                           ([UserID]
+                                                           ,[Date]
+                                                           ,[Dinner]
+                                                           ,[Lunch]
+                                                           ,[LQty]
+                                                           ,[DQty])
+                                                     VALUES
+                                                           (@UserID
+                                                           ,@Date
+                                                           ,@Dinner
+                                                           ,@Lunch
+                                                           ,@LQty
+                                                           ,@DQty)";
 
                 if (SqlTools.ExecuteNonQuery(connection, insertCommand, dataColumns, dataTypes, userInputs) > 0)
                 {

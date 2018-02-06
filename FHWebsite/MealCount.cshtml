@@ -1,0 +1,83 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Meal Count by Member</title>
+    <link rel="stylesheet" href="FHStyle.css" />
+</head>
+<body id="background">
+    @using System.Data.SqlClient;
+    @using System.Data;
+    @using FHWebsite;
+    @using System.Text;
+    @{ 
+        string connection = System.Configuration.ConfigurationManager.ConnectionStrings["FHConnectionString"].ConnectionString;
+        SqlDataReader mealCount;
+        string[] parameters = new string[] {"@Start", "@End"};
+        SqlDbType[] paramTypes = new SqlDbType[] {SqlDbType.Date, SqlDbType.Date};
+        string[] paramValues = new string[] {DateTime.Today.AddMonths(-1).ToString("yyyy-MM-dd"), DateTime.Today.ToString("yyyy-MM-dd")};
+        string command;
+
+        command = @"SELECT [FirstName]
+	                    ,[LastName]
+                        ,SUM(CASE WHEN Dinner = 'DL' OR Dinner = 'LN' OR Dinner = 'DE' OR Dinner = 'DI' THEN DQty ELSE 0 END) AS DinnerCount
+	                    ,SUM(CASE WHEN Lunch = 'LL' OR Lunch = 'LN' OR Lunch = 'LE' OR Lunch = 'LI' THEN LQty ELSE 0 END) AS LunchCount
+                    FROM [dbo].[Members] JOIN [dbo].[Meals] 
+                    ON [dbo].[Meals].UserID = [dbo].[Members].ID
+                    WHERE (Date > CAST(@Start AS DATE) AND Date < CAST(@End AS DATE))
+                    GROUP BY [FirstName], [LastName]
+                    ORDER BY [LastName], [FirstName]";
+
+        // Update the date range
+        if (IsPost)
+        {
+            for(int i=0; i<parameters.Length;i++)
+            {
+                paramValues[i] = Request.Form[parameters[i].Substring(1)];
+            }
+        }
+        // Get counts from the database
+        mealCount = SqlTools.ExecuteQuery(connection, command, parameters, paramTypes, paramValues);
+
+
+
+    }
+    @functions{
+        /// <summary>
+        /// Write data to a table
+        /// </summary>
+        /// <param name="data">Data to write</param>
+        string FormatData(SqlDataReader data)
+        {
+            StringBuilder ret = new StringBuilder();
+            while (data.Read())
+            {
+                ret.AppendFormat("<tr><td>{1}</td><td>{0}</td><td>{3}</td><td>{2}</td></tr>", data.GetValue(0), data.GetValue(1), data.GetValue(2), data.GetValue(3));
+            }
+            return ret.ToString();
+        }
+    }
+    <div class="box">
+        <form style="text-align:center;" id="form1" runat="server" method="post">
+            <h3>
+                Date Range:&nbsp;
+                @{
+                    WriteLiteral("<input type=\"date\" name=\"Start\" value=\"" + DateTime.Today.AddMonths(-1).ToString("yyyy-MM-dd") + "\" />");
+                }
+                &nbsp;
+                @{
+                    WriteLiteral("<input type=\"date\" name=\"End\" value=\"" + DateTime.Today.ToString("yyyy-MM-dd") + "\" />");
+                }
+                <br />
+                <input type="submit" name="submit" value="Change Date" style="margin: 10px;"/>
+            </h3>
+            <h1>Meal Count by Member:</h1>
+            <table>
+                <tr>
+                    <th>Last Name</th><th>First Name</th><th>Dinners</th><th>Lunches</th>
+                </tr>
+                @{ WriteLiteral(FormatData(mealCount));}
+            </table>
+        </form>
+    </div>
+</body>
+</html>
