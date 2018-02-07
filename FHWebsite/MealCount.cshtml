@@ -19,11 +19,11 @@
 
         command = @"SELECT [FirstName]
 	                    ,[LastName]
-                        ,SUM(CASE WHEN Dinner = 'DL' OR Dinner = 'LN' OR Dinner = 'DE' OR Dinner = 'DI' THEN DQty ELSE 0 END) AS DinnerCount
-	                    ,SUM(CASE WHEN Lunch = 'LL' OR Lunch = 'LN' OR Lunch = 'LE' OR Lunch = 'LI' THEN LQty ELSE 0 END) AS LunchCount
+                        ,SUM(CASE WHEN (OutOfHouse = 0) OR (OutOfHouse IS NULL) THEN DQty - 1 WHEN Dinner = 'DL' OR Dinner = 'LN' OR Dinner = 'DE' OR Dinner = 'DI' THEN DQty ELSE 0 END) AS DinnerCount
+	                    ,SUM(CASE WHEN (OutOfHouse = 0) OR (OutOfHouse IS NULL) THEN LQty - 1 WHEN Lunch = 'LL' OR Lunch = 'LN' OR Lunch = 'LE' OR Lunch = 'LI' THEN LQty ELSE 0 END) AS LunchCount
                     FROM [dbo].[Members] JOIN [dbo].[Meals] 
                     ON [dbo].[Meals].UserID = [dbo].[Members].ID
-                    WHERE (Date > CAST(@Start AS DATE) AND Date < CAST(@End AS DATE))
+                    WHERE (Date > CAST('2018-01-01' AS DATE) AND Date < CAST('2018-03-01' AS DATE))
                     GROUP BY [FirstName], [LastName]
                     ORDER BY [LastName], [FirstName]";
 
