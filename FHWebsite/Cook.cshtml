@@ -76,7 +76,7 @@
     <!--Navigation Bar-->
     @Html.Raw(File.ReadAllText(Server.MapPath("Header.html")))
     <div class="box">
-        <form style="text-align:center;" id="form1" runat="server" method="post">
+        <form style="width:100%;text-align:center;" id="form1" runat="server" method="post">
             <h3>
                 Date:&nbsp;
                 @{
@@ -87,7 +87,7 @@
             </h3>
         </form>
         <h1 style="margin-top:5px;margin-bottom:0px;">Number of Sign Ups</h1>
-        <h3 style="margin:0px;text-align:center;">    
+        <h3 style="width:100%;text-align:center;">    
             @{ 
                 if(paramValues.Length > 0)
                 {
