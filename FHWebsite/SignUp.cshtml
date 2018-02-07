@@ -27,7 +27,7 @@
                 }
 
                 // Check if the entered ID is valid
-                isValidId = ((int)SqlTools.ExecuteScalar(connection, "SELECT [ID] FROM [FH].[dbo].[Members] WHERE [ID] = @ID", new string[] { "@ID" }, new SqlDbType[] { SqlDbType.Int }, new string[] { userInputs[0] }) > 0);
+                isValidId = ((int)SqlTools.ExecuteScalar(connection, "SELECT COUNT(*) FROM [FH].[dbo].[Members] WHERE [ID] = @ID", new string[] { "@ID" }, new SqlDbType[] { SqlDbType.Int }, new string[] { userInputs[0] }) > 0);
 
                 string insertCommand = @"UPDATE[dbo].[Meals]
                                                 SET[UserID] = @UserID

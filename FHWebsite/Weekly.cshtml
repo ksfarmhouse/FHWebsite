@@ -65,6 +65,11 @@
                 schedule = SqlTools.ExecuteQuery(connection, command, parameters, paramTypes, paramValues);
                 table = BuildSchedule(schedule);
             }
+            else
+            {
+                buttonText = "Log In";
+                msg = "<h3 class=\"message\">Not a valid User ID</h3>";
+            }
 
 
         }
