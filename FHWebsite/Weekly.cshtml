@@ -9,20 +9,146 @@
     @using System.Data.SqlClient;
     @using FHWebsite;
     @{ 
+        string connection = System.Configuration.ConfigurationManager.ConnectionStrings["FHConnectionString"].ConnectionString;
         string userID = "";
         string buttonText = "Log In";
+        string command;
+        string[] parameters = new string[] { "@UserID" };
+        SqlDbType[] paramTypes = new SqlDbType[] { SqlDbType.Int };
+        string[] paramValues = new string[1];
+        bool isValidId = false;
+        SqlDataReader schedule;
+        string table = "";
+        string msg = "";
+
         if (IsPost)
         {
-            
+            paramValues = GetData(parameters);
+            userID = paramValues[0];
+            buttonText = "Save";
+
+            // Check that this is a real ID
+            isValidId = ((int)SqlTools.ExecuteScalar(connection, "SELECT COUNT(*) FROM [FH].[dbo].[Members] WHERE [ID] = @UserID", parameters, paramTypes, paramValues) > 0);
+
+            if (Request.Form.Count > 3 & isValidId)
+            {
+                // Update the database with new info
+                command = @"UPDATE [dbo].[WeeklyMeals]
+                            SET [MonLunch] = ISNULL(NULLIF({1},''),MonLunch), [MonDinner] = ISNULL(NULLIF({2},''),MonDinner), [TueLunch] = ISNULL(NULLIF({3},''),TueLunch),[TueDinner] = ISNULL(NULLIF({4},''),TueDinner),[WedLunch] = ISNULL(NULLIF({5},''),WedLunch)
+                                ,[WedDinner] = ISNULL(NULLIF({6},''),WedDinner),[ThuLunch] = ISNULL(NULLIF({7},''),ThuLunch),[ThuDinner] = ISNULL(NULLIF({8},''),ThuDinner),[FriLunch] = ISNULL(NULLIF({9},''),FriLunch),[FriDinner] = ISNULL(NULLIF({10},''),FriDinner)
+                            WHERE [UserID] = {0}";
+                parameters = new string[] { "@UserID", "@MonLunch", "@MonDinner", "@TueLunch", "@TueDinner", "@WedLunch", "@WedDinner", "@ThuLunch", "@ThuDinner", "@FriLunch", "@FriDinner"};
+                paramTypes = new SqlDbType[] { SqlDbType.Int, SqlDbType.NChar, SqlDbType.NChar, SqlDbType.NChar, SqlDbType.NChar, SqlDbType.NChar, SqlDbType.NChar, SqlDbType.NChar, SqlDbType.NChar, SqlDbType.NChar, SqlDbType.NChar };
+                paramValues = GetData(parameters);
+                command = String.Format(command, parameters);
+
+                if (SqlTools.ExecuteNonQuery(connection, command, parameters, paramTypes, paramValues) > 0)
+                {
+                    msg = "<h3 class=\"message\">Schedule saved.</h3>";
+                }
+                else
+                {
+                    msg = "<h3 class=\"message\">Something went wrong</h3>";
+                }
+            }
+
+            // Setup to pull the schedule from table
+            command = @"SELECT [MonLunch], [MonDinner], [TueLunch], [TueDinner], [WedLunch], [WedDinner], [ThuLunch], [ThuDinner], [FriLunch], [FriDinner]
+                        FROM [FH].[dbo].[WeeklyMeals] WHERE [UserID] = @UserID";
+            parameters = new string[] { "@UserID" };
+            paramTypes = new SqlDbType[] { SqlDbType.Int };
+            paramValues = new string[] { userID };
+
+            // Display the schedule
+            if (isValidId)
+            {
+                schedule = SqlTools.ExecuteQuery(connection, command, parameters, paramTypes, paramValues);
+                table = BuildSchedule(schedule);
+            }
+
+
         }
     }
     @functions{
+        /// <summary>
+        /// Builds a table for the schedule
+        /// </summary>
+        /// <param name="schedule">The data containing the schedule</param>
+        /// <returns>A string containing an HTML table with the schedule</returns>
+        string BuildSchedule(SqlDataReader schedule)
+        {
+            string lunchDropDown = "<br /><select name=\"{0}Lunch\"><option value=\"\">No Change</option><option value=\"LI\">In</option><option value=\"LO\">Out</option><option value=\"LE\">Early</option><option value=\"LL\">Late</option><option value=\"LN\">Late (NOS)</option></select>";
+            string dinnerDropDown = "<br /><select name=\"{0}Dinner\"><option value=\"\">No Change</option><option value=\"DI\">In</option><option value=\"DO\">Out</option><option value=\"DE\">Early</option><option value=\"DL\">Late</option><option value=\"LN\">Late (NOS)</option></select>";
+            string[] days = { "Mon", "Tue", "Wed", "Thu", "Fri" };
+            string table = File.ReadAllText(Server.MapPath("Schedule.html"));
+
+            string[] insertion = new string[10];
+
+            schedule.Read();
+
+            // Build array with the data
+            for (int i = 0; i < insertion.Length; i++)
+            {
+                switch (schedule[i].ToString())
+                {
+                    case "DL":
+                    case "LL":
+                        insertion[i] = "Late";
+                        break;
+                    case "LN":
+                        insertion[i] = "Late (NOS)";
+                        break;
+                    case "DI":
+                    case "LI":
+                        insertion[i] = "In";
+                        break;
+                    case "LO":
+                    case "DO":
+                        insertion[i] = "Out";
+                        break;
+                    case "LE":
+                    case "DE":
+                        insertion[i] = "Early";
+                        break;
+                }
+                // Choose the right meal and day
+                if (0 == i % 2)
+                {
+                    insertion[i] += String.Format(lunchDropDown, days[i / 2]);
+                }
+                else
+                {
+                    insertion[i] += String.Format(dinnerDropDown, days[i / 2]);
+                }
+            }
+
+            return String.Format(table, insertion);
+        }
+
+        /// <summary>
+        /// Reads the values from the form
+        /// </summary>
+        /// <param name="parameters">Values to look for (written in the format: "@something")</param>
+        /// <returns></returns>
+        string[] GetData(string[] parameters)
+        {
+            string[] paramValues = new string[parameters.Length];
+            for (int i = 0; i < parameters.Length; i++)
+            {
+                paramValues[i] = Request.Form[parameters[i].Substring(1)];
+            }
+            return paramValues;
+        }
     }
     @Html.Raw(File.ReadAllText(Server.MapPath("Header.html")))
     <div class="box">
+        @Html.Raw(msg)
         <form id="form1" method="post">
-            <h3>User ID: <input type="text" name="UserID" size="2" value="@(userID)"/><input type="submit" name="submit" value="@(buttonText)" /></h3>
+            <h3 style="text-align:center;">User ID: <input type="text" name="UserID" size="2" value="@(userID)" @{if (IsPost & isValidId) { WriteLiteral("readonly=\"readonly\""); } }/>&nbsp;<input type="submit" name="submit" value="@(buttonText)" /></h3>
+            <input type="hidden" name="meals" value="@{if (IsPost) { WriteLiteral("Y"); } }" />
+            @Html.Raw(table)
         </form>
+
     </div>
 </body>
 </html>

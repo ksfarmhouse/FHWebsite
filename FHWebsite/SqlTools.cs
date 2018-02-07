@@ -31,6 +31,18 @@ namespace FHWebsite
 
         }
 
+        public static object ExecuteScalar(string con, string cmd, string[] parameters, SqlDbType[] paramTypes, string[] paramValues)
+        {
+            SqlConnection db = new SqlConnection(con);
+            SqlCommand command = new SqlCommand(cmd, db);
+
+            // Parameterize the command and add the values
+            BuildCommand(command, parameters, paramTypes, paramValues);
+
+            db.Open();
+            return command.ExecuteScalar();
+        }
+
         private static SqlCommand BuildCommand(SqlCommand cmd, string[] parameters, SqlDbType[] paramTypes, string[] paramValues)
         {
             // Parameterize the command and add values
