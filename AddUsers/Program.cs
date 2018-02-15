@@ -7,7 +7,7 @@ namespace AddUsers
     /// <summary>
     /// This is an app that will add users to the SQL database by reading names from a CSV file. 
     /// Note that there is a wrapper class called SqlTools in the FHWebsite namespace designed to run SQL commands.
-    /// Also, use the connection string from FHWebsite to connect to the SQL database.
+    /// Also, use the connection string from app.config to connect to the SQL database. Look at any webpage for examples.
     /// </summary>
     class Program
     {
