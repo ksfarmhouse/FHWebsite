@@ -5,6 +5,10 @@ VisualStudioVersion = 15.0.26430.15
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FHWebsite", "FHWebsite\FHWebsite.csproj", "{DA268840-9EF7-4C9F-975D-EF3872C97346}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoutineSignUp", "RoutineSignUp\RoutineSignUp.csproj", "{8BB2715E-EDE1-4791-A985-F2B270A77799}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AddUsers", "AddUsers\AddUsers.csproj", "{99525035-5C46-4BAC-890C-035684466E92}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{DA268840-9EF7-4C9F-975D-EF3872C97346}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DA268840-9EF7-4C9F-975D-EF3872C97346}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DA268840-9EF7-4C9F-975D-EF3872C97346}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8BB2715E-EDE1-4791-A985-F2B270A77799}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8BB2715E-EDE1-4791-A985-F2B270A77799}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8BB2715E-EDE1-4791-A985-F2B270A77799}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8BB2715E-EDE1-4791-A985-F2B270A77799}.Release|Any CPU.Build.0 = Release|Any CPU
+		{99525035-5C46-4BAC-890C-035684466E92}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{99525035-5C46-4BAC-890C-035684466E92}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{99525035-5C46-4BAC-890C-035684466E92}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{99525035-5C46-4BAC-890C-035684466E92}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
