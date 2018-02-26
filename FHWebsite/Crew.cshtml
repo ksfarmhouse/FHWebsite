@@ -16,14 +16,16 @@
 	                          ,[Lunch]
                         FROM [dbo].[Meals] JOIN [dbo].[Members]
                         ON [dbo].[Meals].UserID = [dbo].[Members].ID
-                        WHERE (Lunch = 'LL' OR Lunch = 'LN') AND Date = CAST(GETDATE() AS DATE)";
+                        WHERE (Lunch = 'LL' OR Lunch = 'LN') AND Date = CAST(GETDATE() AS DATE)
+                        ORDER BY Lunch, LastName";
         SqlDataReader lunch = SqlTools.ExecuteQuery(connection, cmd, new string[] { }, new SqlDbType[] { }, new string[] { });
         cmd = @"SELECT [FirstName]
 	                    ,[LastName]
 	                    ,[Dinner]
                 FROM [dbo].[Meals] JOIN [dbo].[Members]
                 ON [dbo].[Meals].UserID = [dbo].[Members].ID
-                WHERE (Dinner = 'DL' OR Dinner = 'LN') AND Date = CAST(GETDATE() AS DATE)";
+                WHERE (Dinner = 'DL' OR Dinner = 'LN') AND Date = CAST(GETDATE() AS DATE)
+                ORDER BY Dinner, LastName";
         SqlDataReader dinner = SqlTools.ExecuteQuery(connection, cmd, new string[] { }, new SqlDbType[] { }, new string[] { });
     }
     @functions{
