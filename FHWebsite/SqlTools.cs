@@ -27,8 +27,9 @@ namespace FHWebsite
             BuildCommand(command, parameters, paramTypes, paramValues);
 
             db.Open();
-            return command.ExecuteNonQuery();
-
+            var ret = command.ExecuteNonQuery();
+            db.Close();
+            return ret;
         }
 
         public static object ExecuteScalar(string con, string cmd, string[] parameters, SqlDbType[] paramTypes, string[] paramValues)
@@ -40,7 +41,9 @@ namespace FHWebsite
             BuildCommand(command, parameters, paramTypes, paramValues);
 
             db.Open();
-            return command.ExecuteScalar();
+            var ret = command.ExecuteScalar();
+            db.Close();
+            return ret;
         }
 
         private static SqlCommand BuildCommand(SqlCommand cmd, string[] parameters, SqlDbType[] paramTypes, string[] paramValues)
