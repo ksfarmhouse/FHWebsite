@@ -1,17 +1,14 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-    <title>Meal Count by Day</title>
+    <title>Menu</title>
     <link rel="stylesheet" href="FHStyle.css" />
-	<link rel=”apple-touch-icon” href=”/AppleIcon.png”/>
-	<link rel=”apple-touch-icon-precomposed” href=”/AppleIcon.png”/>
-	<link rel="manifest" href="/manifest.json"/>
 </head>
 <body id="background">
     @using System.Data.SqlClient;
     @using System.Data;
     @using FHWebsite;
-    @{ 
+    @{
         string connection = System.Configuration.ConfigurationManager.ConnectionStrings["FHConnectionString"].ConnectionString;
         string lunch;
         string dinner;
@@ -90,9 +87,9 @@
             </h3>
         </form>
         <h1 style="margin-top:5px;margin-bottom:0px;">Number of Sign Ups</h1>
-        <h3 style="width:100%;text-align:center;">    
-            @{ 
-                if(paramValues.Length > 0)
+        <h3 style="width:100%;text-align:center;">
+            @{
+                if (paramValues.Length > 0)
                 {
                     WriteLiteral(paramValues[0]);
                 }
@@ -101,24 +98,27 @@
                     WriteLiteral(DateTime.Today.ToString("yyyy-MM-dd"));
                 }
             }
-        </h3">
-        <table style="margin-top:10px;font-weight:600;">
-            <tr>
-                <th></th><th><h3>In</h3></th><th><h3>Late</h3></th><th><h3>Early</h3></th><th><h3>Total</h3></th>
-            </tr>
-            <tr style="text-align:right;">
-                <td><h3>Lunch</h3></td>
-                @{
-                    WriteLiteral(String.Format("<td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td>", lunchValues[0], lunchValues[1], lunchValues[2], lunchValues.Sum()));
-                }
-            </tr>
-            <tr style="text-align:right;">
-                <td><h3>Dinner</h3></td>
-                @{
-                    WriteLiteral(String.Format("<td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td>", dinnerValues[0], dinnerValues[1], dinnerValues[2], dinnerValues.Sum()));
-                }
-            </tr>
-        </table>
+            </h3>
+            <table style="margin-top:10px;font-weight:600;">
+                <tr>
+                    <th></th>
+                    <th><h3>Day</h3></th>
+                    <th><h3>Lunch</h3></th>
+                    <th><h3>Dinner</h3></th>
+                </tr>
+                <tr style="text-align:right;">
+                    <td><h3>Lunch</h3></td>
+                    @{
+                        WriteLiteral(String.Format("<td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td>", lunchValues[0], lunchValues[1], lunchValues[2], lunchValues.Sum()));
+                    }
+                </tr>
+                <tr style="text-align:right;">
+                    <td><h3>Dinner</h3></td>
+                    @{
+                        WriteLiteral(String.Format("<td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td>", dinnerValues[0], dinnerValues[1], dinnerValues[2], dinnerValues.Sum()));
+                    }
+                </tr>
+            </table>
     </div>
 </body>
 </html>

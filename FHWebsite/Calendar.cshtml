@@ -1,0 +1,130 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Your Meals</title>
+    <link rel="stylesheet" href="FhStyle.css" />
+	<link rel=”apple-touch-icon” href=”/AppleIcon.png”/>
+	<link rel=”apple-touch-icon-precomposed” href=”/AppleIcon.png”/>
+	<link rel="manifest" href="/manifest.json"/>
+</head>
+<body id="background">
+    @using System.Data;
+    @using System.Data.SqlClient;
+    @using FHWebsite;
+    @{
+        string connection = System.Configuration.ConfigurationManager.ConnectionStrings["FHConnectionString"].ConnectionString;
+        string userID = "";
+        string buttonText = "Log In";
+        string command;
+        string[] parameters = new string[] { "@UserID", "@Date" };
+        SqlDbType[] paramTypes = new SqlDbType[] { SqlDbType.Int, SqlDbType.Date };
+        string[] paramValues = new string[1];
+        bool isValidId = false;
+        SqlDataReader schedule;
+        string table = "";
+        string msg = "";
+        string day;
+        DateTime date = DateTime.Today;
+
+        if (IsPost)
+        {
+            paramValues = GetData(parameters);
+            userID = paramValues[0];
+            date = DateTime.Parse(paramValues[1]);
+
+            // Check that this is a real ID
+            isValidId = ((int)SqlTools.ExecuteScalar(connection, "SELECT COUNT(*) FROM [FH].[dbo].[Members] WHERE [ID] = @UserID", parameters, paramTypes, paramValues) > 0);
+
+            // Setup to pull the schedule from table
+            day = date.DayOfWeek.ToString().Substring(0, 3);
+            command = @"IF EXISTS(SELECT UserID FROM Meals WHERE [Date] = @Date AND UserID = @UserID)
+	                        SELECT CASE WHEN [Meals].[Dinner] IS NULL THEN [WeeklyMeals].{0}Dinner ELSE Meals.Dinner END AS Dinner
+		                          ,CASE WHEN [Lunch] IS NULL THEN [WeeklyMeals].{0}Lunch ELSE Meals.Lunch END AS Lunch
+	                        FROM [dbo].[Meals] LEFT JOIN [dbo].[WeeklyMeals] ON Meals.UserID = WeeklyMeals.UserID
+	                        WHERE Meals.UserID = @UserID AND [Date] = @Date;
+                        ELSE
+	                        SELECT {0}Dinner AS Dinner, {0}Lunch AS Lunch
+	                        FROM WeeklyMeals WHERE UserID = @UserID;";
+            command = String.Format(command, day);
+
+            if (isValidId && (day != "Sun" && day != "Sat"))
+            {
+                schedule = SqlTools.ExecuteQuery(connection, command, parameters, paramTypes, paramValues);
+                schedule.Read();
+
+                table = String.Format("<tr><th><h3>Lunch</h3></th><th><h3>Dinner</h3></th></tr><tr><td>{1}</td><td>{0}</td></tr>", schedule[0].ToString(), schedule[1].ToString());
+                table = ReplaceMultiple(table, new string[] { "LN", "LI", "LE", "LO", "LL", "DI", "DE", "DO", "DL" }, new string[] { "Late (NOS)", "In", "Early", "Out", "Late", "In", "Early", "Out", "Late" });
+            }
+            else
+            {
+                msg = "<h3 class=\"message\">Not a valid User ID</h3>";
+                if(day == "Sun" || day == "Sat")
+                {
+                    msg = "You can't view meals on a weekend.";
+                }
+            }
+
+
+        }
+    }
+    @functions{
+        /// <summary>
+        /// Reads the values from the form
+        /// </summary>
+        /// <param name="parameters">Values to look for (written in the format: "@something")</param>
+        /// <returns></returns>
+        string[] GetData(string[] parameters)
+        {
+            string[] paramValues = new string[parameters.Length];
+            for (int i = 0; i < parameters.Length; i++)
+            {
+                paramValues[i] = Request.Form[parameters[i].Substring(1)];
+            }
+            return paramValues;
+        }
+
+        /// <summary>
+        /// Replaces many items with a string
+        /// </summary>
+        /// <param name="original">The original string</param>
+        /// <param name="gettingReplaced">Array of strings to be replaced</param>
+        /// <param name="replaceWith">Array of strings to replace the previous array</param>
+        /// <returns></returns>
+        string ReplaceMultiple(string original, string[] gettingReplaced, string[] replaceWith)
+        {
+            if(gettingReplaced.Length != replaceWith.Length)
+            {
+                throw new IndexOutOfRangeException("The argument arrays have different lengths");
+            }
+            for(int i=0; i<replaceWith.Length; i++)
+            {
+                original = original.Replace(gettingReplaced[i], replaceWith[i]);
+            }
+            return original;
+        }
+
+    }
+    @Html.Raw(File.ReadAllText(Server.MapPath("Header.html")))
+    <div class="box">
+        @Html.Raw(msg)
+        <form id="form1" method="post">
+            <h3 style="text-align:center;">
+                Date:&nbsp;
+                @{
+                    WriteLiteral("<input type=\"date\" name=\"Date\" value=\"" + date.ToString("yyyy-MM-dd") + "\" />");
+                }
+                &nbsp;
+            </h3>
+            <h3 style="text-align:center;">User ID: <input type="text" name="UserID" size="2" value="@(userID)" @{if (IsPost & isValidId) { WriteLiteral("readonly=\"readonly\""); } } />&nbsp;<input type="submit" name="submit" value="View Meals" /></h3>
+            <input type="hidden" name="meals" value="@{if (IsPost) { WriteLiteral("Y"); } }" />
+            <table>
+
+                @Html.Raw(table)
+            </table>
+
+
+        </form>
+
+    </div>
+</body>
+</html>

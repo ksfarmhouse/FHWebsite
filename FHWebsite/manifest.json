@@ -1,0 +1,19 @@
+{
+  "short_name": "Meals",
+  "name": "FarmHouse Meals",
+  "start_url": "SignUp.cshtml",
+  "icons": [
+	{
+      "src": "AndroidIcon634.png",
+      "type": "image/png",
+      "sizes": "634x634"
+    },
+    {
+      "src": "AndroidIcon194.png",
+      "type": "image/png",
+      "sizes": "194x194"
+    }
+  ],
+  "display": "standalone",
+  "background_color": "#ffce00"
+}

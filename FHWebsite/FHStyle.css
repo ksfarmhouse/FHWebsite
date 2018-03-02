@@ -1,27 +1,4 @@
-﻿@media only screen and (max-width: 1080px) {
-    body {
-        font-size: 30px;
-    }
-
-    h1 {
-        font-size: 65px;
-    }
-
-    h3 {
-        font-size: 45px;
-    }
-
-    p {
-        font-size: 30px;
-    }
-
-    input, select {
-        font-size: 30px;
-        height: 40px;
-    }
-}
-
-#background {
+﻿#background {
     background-color: #006938;
     height: 100%;
 }
@@ -91,7 +68,7 @@ table h3 {
     }
 
     .box input[type=date] {
-        width: 124px;
+        width: 128px;
     }
 
     .box input[type=number] {
@@ -152,4 +129,41 @@ table h3 {
 
 ::-webkit-scrollbar {
     display: none;
+}
+
+@media only screen and (max-width: 1080px) {
+    body {
+        font-size: 30px;
+    }
+
+    h1 {
+        font-size: 65px;
+    }
+
+    h3 {
+        font-size: 45px;
+    }
+
+    p {
+        font-size: 30px;
+    }
+
+    input, select {
+        font-size: 30px;
+        height: 60px;
+    }
+	
+	.box {
+		max-width: 1080px;
+		width: 90%;
+	}
+	
+	.box input[type=number] {
+		text-align: center;
+		width: 35px;
+	}
+	
+	.box input[type=date] {
+        width: 250px;
+    }
 }
