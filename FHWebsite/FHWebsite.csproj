@@ -162,7 +162,6 @@
     </Content>
     <Content Include="Crew.cshtml" />
     <Content Include="Cook.cshtml" />
-    <Content Include="Calendar.cshtml" />
     <None Include="FHDataSet.xsd">
       <Generator>MSDataSetGenerator</Generator>
       <LastGenOutput>FHDataSet.Designer.cs</LastGenOutput>
@@ -173,7 +172,6 @@
     </Content>
     <Content Include="Header.html" />
     <Content Include="MealCount.cshtml" />
-    <Content Include="Menu.cshtml" />
     <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Meals.aspx" />
