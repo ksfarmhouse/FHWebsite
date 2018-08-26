@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+@{ string msg = "";}
+<head runat="server">
+    <title>FH Menu Input</title>
+    <link rel=”apple-touch-icon” href=”/apple-touch-icon.png” />
+    <!--<link rel=”apple-touch-icon-precomposed” href=”/apple-touch-icon.png”/>-->
+    <link rel=”icon” href=”/apple-touch-icon.png” />
+    <link rel="manifest" href="/manifest.json">
+    <link rel="stylesheet" href="FhStyle.css">
+</head>
+<body id="background">
+    <form id="form1" runat="server" method="post">
+        @using System.Data.SqlClient;
+        @using System.Data;
+        @using FHWebsite;
+        @{
+            string[] dataColumns = { "Date", "Day", "Lunch", "Dinner" };
+            SqlDbType[] dataTypes = { SqlDbType.Date, SqlDbType.NChar, SqlDbType.VarChar, SqlDbType.VarChar };
+            string[] userInputs = new string[4];
+            string connection = System.Configuration.ConfigurationManager.ConnectionStrings["FHConnectionString"].ConnectionString;
+            DateTime todayDate = DateTime.Now.Date;
+            
+
+            if (IsPost)
+            {
+                // Get user inputs
+                for (int i = 0; i < dataColumns.Length; i++)
+                {
+                    userInputs[i] = Request.Form[dataColumns[i]];
+                }
+
+                string insertCommand = @"UPDATE[dbo].[Menu]
+                SET[Date] = ISNULL(NULLIF(@Date,''), Date)
+                ,[Day] = ISNULL(NULLIF(@Day,''), Day)
+                ,[Lunch] = ISNULL(NULLIF(@Lunch,''), Lunch)
+                ,[Dinner] = ISNULL(NULLIF(@Dinner,''), Dinner)
+                WHERE [Date] = @Date
+                IF @@ROWCOUNT=0
+                INSERT INTO [dbo].[Meals]
+                ([Date]
+                ,[Day]
+                ,[Lunch]
+                ,[Dinner]
+                VALUES
+                (@Date
+                ,@Day
+                ,@Lunch
+                ,@Dinner
+                )";
+
+                // Provide output message
+                if (SqlTools.ExecuteNonQuery(connection, insertCommand, dataColumns, dataTypes, userInputs) > 0)
+                {
+                    msg = "<h3 class=\"message\">Entry submitted</h3>";
+                }
+                else
+                {
+                    msg = "<h3 class=\"message\">Something went wrong</h3>";
+                }
+            }
+        }
+        <!--Navigation Bar-->
+        @Html.Raw(File.ReadAllText(Server.MapPath("Header.html")))
+        <div class="box">
+            <h1>FarmHouse Menu Input</h1>
+            @{WriteLiteral(msg);}
+            <table style="margin-top:10px;font-weight:600;">
+                <tr>
+                    <th><h3>Date</h3></th>
+                    <th><h3>Day</h3></th>
+                    <th><h3>Lunch</h3></th>
+                    <th><h3>Dinner</h3></th>
+                </tr>
+                @for(int i = 0; i < 7; i++)
+                    {
+                        WriteLiteral(String.Format("<tr><td>{0}</td><td>{1}</td>", todayDate.ToShortDateString(), todayDate.DayOfWeek));
+                        <td><input type="text" name="lunch" size="20" id=lunch-@i /></td>
+                        <td><input type="text" name="dinner" size="20" id=dinner-@i /></td>
+                        todayDate = todayDate.AddDays(1);
+                    }
+                <td><input type="submit" name="submit" value="Submit" /></td>
+            </table>
+        </div>
+    </form>
+</body>
+</html>
