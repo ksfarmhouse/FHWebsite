@@ -17,4 +17,4 @@ Displays the names of all members signed up for late plates today. Meant for cre
 Displays the number of non included meals for every member so they can be charged appropriately.
 
 ## Menu
-Displays the menu for each day for a week. Meant for out of house members to know what the menu is.
+Displays the menu for each day for a week. Meant for out of house members to know the menu.
