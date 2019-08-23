@@ -54,7 +54,8 @@
             StringBuilder ret = new StringBuilder();
             while (data.Read())
             {
-                ret.AppendFormat("<tr><td>{1}</td><td>{0}</td><td>{2}</td><td>{3}</td></tr>", data.GetValue(0), data.GetValue(1), data.GetValue(2), data.GetValue(3));
+		if (data.GetValue(2).ToString() != "0" || data.GetValue(3).ToString() != "0")
+                	ret.AppendFormat("<tr><td>{1}</td><td>{0}</td><td>{2}</td><td>{3}</td></tr>", data.GetValue(0), data.GetValue(1), data.GetValue(2), data.GetValue(3));
             }
             return ret.ToString();
         }

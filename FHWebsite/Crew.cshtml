@@ -21,7 +21,8 @@
                         FROM [dbo].[Meals] JOIN [dbo].[Members]
                         ON [dbo].[Meals].UserID = [dbo].[Members].ID
                         WHERE (Lunch = 'LL' OR Lunch = 'LN') AND Date = CAST(GETDATE() AS DATE)
-						ORDER BY Lunch, LastName";
+						ORDER BY LastName";
+						//ORDER BY Lunch, LastName"; //NOS
         SqlDataReader lunch = SqlTools.ExecuteQuery(connection, cmd, new string[] { }, new SqlDbType[] { }, new string[] { });
         cmd = @"SELECT [FirstName]
 	                    ,[LastName]
@@ -29,7 +30,8 @@
                 FROM [dbo].[Meals] JOIN [dbo].[Members]
                 ON [dbo].[Meals].UserID = [dbo].[Members].ID
                 WHERE (Dinner = 'DL' OR Dinner = 'LN') AND Date = CAST(GETDATE() AS DATE)
-				ORDER BY Dinner, LastName";
+				ORDER BY LastName";
+				//ORDER BY Dinner, LastName"; //NOS
         SqlDataReader dinner = SqlTools.ExecuteQuery(connection, cmd, new string[] { }, new SqlDbType[] { }, new string[] { });
     }
     @functions{
@@ -43,11 +45,12 @@
             StringBuilder ret = new StringBuilder();
             while (data.Read())
             {
-                if ((string)data.GetValue(2) == "LN")
-                    nos = "NOS";
-                else
-                    nos = "";
-                ret.AppendFormat("<tr><td>{0} {1}</td><td>{2}</td></tr>", data.GetValue(0), data.GetValue(1), nos);
+                //if ((string)data.GetValue(2) == "LN")
+                    //nos = "NOS";
+                //else
+                    //nos = "";
+                //ret.AppendFormat("<tr><td>{0} {1}</td><td>{2}</td></tr>", data.GetValue(0), data.GetValue(1), nos);
+                ret.AppendFormat("<tr><td>{0} {1}</td></tr>", data.GetValue(0), data.GetValue(1));
             }
             return ret.ToString();
         }
@@ -58,14 +61,14 @@
         <h1>Lunch Late Plates</h1><br />
         <table>
             <tr>
-                <th><h3>Name</h3></th><th><h3>NOS</h3></th>
+                <th><h3>Name</h3></th><!--<th><h3>NOS</h3></th>-->
             </tr>
             @{WriteLiteral(FormatData(lunch));}
         </table>
         <h1>Dinner Late Plates</h1>
         <table>
             <tr>
-                <th><h3>Name</h3></th><th><h3>NOS</h3></th>
+                <th><h3>Name</h3></th><!--<th><h3>NOS</h3></th>-->
             </tr>
             @{WriteLiteral(FormatData(dinner));}
         </table>

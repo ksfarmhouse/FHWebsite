@@ -85,8 +85,8 @@
         /// <returns>A string containing an HTML table with the schedule</returns>
         string BuildSchedule(SqlDataReader schedule)
         {
-            string lunchDropDown = "<br /><select name=\"{0}Lunch\"><option value=\"\">No Change</option><option value=\"LI\">In</option><option value=\"LO\">Out</option><option value=\"LE\">Early</option><option value=\"LL\">Late</option><option value=\"LN\">Late (NOS)</option></select>";
-            string dinnerDropDown = "<br /><select name=\"{0}Dinner\"><option value=\"\">No Change</option><option value=\"DI\">In</option><option value=\"DO\">Out</option><option value=\"DE\">Early</option><option value=\"DL\">Late</option><option value=\"LN\">Late (NOS)</option></select>";
+            string lunchDropDown = "<br /><select name=\"{0}Lunch\"><option value=\"\">No Change</option><option value=\"LI\">In</option><option value=\"LO\">Out</option><option value=\"LE\">Early</option><option value=\"LL\">Late</option></select>"; //<option value=\"LN\">Late (NOS)</option>
+            string dinnerDropDown = "<br /><select name=\"{0}Dinner\"><option value=\"\">No Change</option><option value=\"DI\">In</option><option value=\"DO\">Out</option><option value=\"DE\">Early</option><option value=\"DL\">Late</option></select>"; //<option value=\"LN\">Late (NOS)</option>
             string[] days = { "Mon", "Tue", "Wed", "Thu", "Fri" };
             string table = File.ReadAllText(Server.MapPath("Schedule.html"));
 
