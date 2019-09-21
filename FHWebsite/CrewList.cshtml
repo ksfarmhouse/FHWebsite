@@ -40,7 +40,7 @@
     @functions{
         void DisplayNames(string text, int start, int end, List<string[]> data, bool emptyLastLine)
         {
-            if (end % 10 == 0 || end == 34 && end != 60)
+            if ((end % 10 == 0 || end == 34) && end != 60)
                 WriteLiteral(String.Format("<tr style='border-bottom: 5px solid black;'><td style='border-right: 5px solid black;' >{0}</td>", text));
             else
                 WriteLiteral(String.Format("<tr'><td style='border-right: 5px solid black;'>{0}</td>", text));
