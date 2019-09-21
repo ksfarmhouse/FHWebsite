@@ -1,0 +1,110 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Crews</title>
+    <link rel=”apple-touch-icon” href=”/apple-touch-icon.png” />
+    <!--<link rel=”apple-touch-icon-precomposed” href=”/apple-touch-icon.png”/>-->
+    <link rel=”icon” href=”/apple-touch-icon.png” />
+    <link rel="manifest" href="/manifest.json">
+    <link rel="stylesheet" href="FHStyle.css" />
+</head>
+<body id="background">
+    @using System.Data.SqlClient;
+    @using System.Data;
+    @using FHWebsite;
+    @{
+        string connection = System.Configuration.ConfigurationManager.ConnectionStrings["FHConnectionString"].ConnectionString;
+        SqlConnection con = new SqlConnection(connection);
+        con.Open();
+
+        string query = String.Format(@"SELECT C.CrewID, C.DayID, C.OrderNumber, M.FirstName, M.LastName
+                    FROM [dbo].Crews C INNER JOIN [dbo].Members M ON C.UserID = M.ID
+                    ORDER BY CrewID ASC, OrderNumber ASC, DayID ASC");
+        SqlCommand command = new SqlCommand(query, con);
+        SqlDataReader reader = command.ExecuteReader();
+
+        List<string[]> data = new List<string[]>();
+        while (reader.Read())
+        {
+            string[] tmp = new string[5];
+            for (int i = 0; i < reader.FieldCount; i++)
+            {
+                tmp[i] = reader[i].ToString();
+            }
+            data.Add(tmp);
+        }
+        con.Close();
+
+    }
+
+    @functions{
+        void DisplayNames(string text, int start, int end, List<string[]> data, bool emptyLastLine)
+        {
+            if (end % 10 == 0 || end == 34 && end != 60)
+                WriteLiteral(String.Format("<tr style='border-bottom: 5px solid black;'><td style='border-right: 5px solid black;' >{0}</td>", text));
+            else
+                WriteLiteral(String.Format("<tr'><td style='border-right: 5px solid black;'>{0}</td>", text));
+            for (int i = start; i < end; i++)
+            {
+                WriteLiteral(String.Format("<td style='text-align: center;'>{0} {1}</td>", data[i][3], data[i][4]));
+            }
+            if (emptyLastLine)
+                WriteLiteral(String.Format("<td></td>"));
+            WriteLiteral(String.Format("</tr>"));
+        }
+
+        void DividerLine()
+        {
+            WriteLiteral(String.Format("<hr>"));
+            /*for (int i = 0; i < 6; i++)
+            {
+                WriteLiteral(String.Format("<td></td>"));
+            }
+            WriteLiteral(String.Format("</tr>"));*/
+        }
+    }
+    <!--Navigation Bar-->
+    @Html.Raw(File.ReadAllText(Server.MapPath("Header.html")))
+    <div class="box">
+        <h1 style="margin-top:5px;margin-bottom:0px;">Crews</h1>
+        <table style="margin-top:10px;font-weight:600;">
+            <tr style="border-bottom: solid 5px black">
+                <th></th>
+                <th><h3>Monday</h3></th>
+                <th><h3>Tuesday</h3></th>
+                <th><h3>Wednesday</h3></th>
+                <th><h3>Thursday</h3></th>
+                <th><h3>Friday</h3></th>
+            </tr>
+            @{
+                DisplayNames("Breakfast", 0, 5, data, false);
+                DisplayNames("6:00", 5, 10, data, false);
+
+                DividerLine();
+
+                DisplayNames("Early Lunch", 10, 15, data, false);
+                DisplayNames("11:00-12:05", 15, 20, data, false);
+
+                DividerLine();
+
+                DisplayNames("Late Lunch", 20, 25, data, false);
+                DisplayNames("12:05-Done", 25, 30, data, false);
+
+                DividerLine();
+
+                DisplayNames("Kitchen Helper", 30, 34, data, true);
+
+                DividerLine();
+
+                DisplayNames("Dinner", 34, 39, data, false);
+                DisplayNames("5:00", 39, 44, data, false);
+                DisplayNames("", 44, 48, data, true);
+                DisplayNames("", 48, 52, data, true);
+                DisplayNames("", 52, 56, data, true);
+                DisplayNames("", 56, 60, data, true);
+
+            }
+        </table>
+    </div>
+</body>
+</html>
