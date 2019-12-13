@@ -174,9 +174,12 @@
     </Content>
     <Content Include="Header.html" />
     <Content Include="MealCount.cshtml" />
+    <Content Include="Prayer\new.cshtml" />
+    <Content Include="Prayer\index.cshtml" />
     <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Meals.aspx" />
+    <Content Include="Prayer\Prayer.css" />
     <Content Include="Schedule.html" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />

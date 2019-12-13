@@ -1,0 +1,97 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Prayers</title>
+    <link rel="stylesheet" href="Prayer.css" />
+    <link rel=”apple-touch-icon” href=”/AppleIcon.png” />
+    <link rel=”apple-touch-icon-precomposed” href=”/AppleIcon.png” />
+    <link rel="manifest" href="/manifest.json" />
+</head>
+<body id="background">
+    @using System.Text;
+    @using System.Data;
+    @using System.Data.SqlClient;
+    @using FHWebsite;
+    @{
+        string connection = System.Configuration.ConfigurationManager.ConnectionStrings["FHConnectionString"].ConnectionString;
+        string type = "Prayer";
+        string command;
+        string[] parameters = new string[] { "@type" };
+        SqlDbType[] paramTypes = new SqlDbType[] { SqlDbType.Char };
+        string[] paramValues = new string[1];
+        SqlDataReader list;
+        string fullList = "";
+
+        if (IsPost)
+        {
+            paramValues = GetData(parameters);
+            type = paramValues[0];
+
+            // Setup to pull the prayers from db
+            command = @"SELECT M.FirstName, M.LastName, PR.Date, PR.Description
+                FROM [FH].[dbo].[PrayerRequests] PR
+                    INNER JOIN [FH].[dbo].[Members] M ON M.ID = PR.UserID
+                    LEFT JOIN [FH].[dbo].[PrayerComments] PC ON PR.PrayerID = PC.PrayerID
+                WHERE PR.[Type] = @type
+                ORDER BY PR.[Date] DESC";
+            parameters = new string[] { "@type" };
+            paramTypes = new SqlDbType[] { SqlDbType.Char };
+            paramValues = new string[] { type };
+
+            // Display the prayers
+            list = SqlTools.ExecuteQuery(connection, command, parameters, paramTypes, paramValues);
+            fullList = BuildList(list);
+
+        }
+    }
+    @functions{
+        string BuildList(SqlDataReader list)
+        {
+            StringBuilder fullList = new StringBuilder();
+
+
+            while (list.Read())
+            {
+                fullList.Append("<div class='prayer-box'>");
+                fullList.Append("<p style='font-size:0.75em; margin-left: 0; margin-bottom: 15px;'>" + list.GetString(0) + " " + list.GetString(1) + "<br>" + list.GetDateTime(2).ToString("MMMM dd, yyyy h:mm tt") + "</p>" + list.GetString(3));
+                fullList.Append("</div>");
+            }
+
+
+            return fullList.ToString();
+        }
+
+        string[] GetData(string[] parameters)
+        {
+            string[] paramValues = new string[parameters.Length];
+            for (int i = 0; i < parameters.Length; i++)
+            {
+                paramValues[i] = Request.Form[parameters[i].Substring(1)];
+            }
+            return paramValues;
+        }
+
+        void Selected(string type, string value)
+        {
+            if (type == value)
+                WriteLiteral("selected");
+        }
+    }
+    <div class="box">
+        <form id="form1" method="post">
+            <a href="new.cshtml"><h3 class="nav-button">+ Add New</h3></a>
+                <h1>FarmHouse Prayers</h1>
+                <h3 style="text-align:center;">
+                    Type: <select name="type">
+                        <option value="Prayer" @{Selected(type, "Prayer");}>Prayers</option>
+                        <option value="Answered" @{Selected(type, "Answered");}>Answered Prayers</option>
+                        <option value="Praise" @{Selected(type, "Praise");}>Praises</option>
+                    </select>
+                    &nbsp;<input type="submit" name="submit" value="Filter" />
+                </h3>
+                @Html.Raw(fullList)
+</form>
+
+    </div>
+</body>
+</html>

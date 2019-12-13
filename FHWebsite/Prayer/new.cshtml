@@ -1,0 +1,80 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+@{ string msg = "";
+    string description = "";}
+<head runat="server">
+    <title>New Prayer/Praise</title>
+    <link rel=”apple-touch-icon” href=”/apple-touch-icon.png” />
+    <!--<link rel=”apple-touch-icon-precomposed” href=”/apple-touch-icon.png”/>-->
+    <link rel=”icon” href=”/apple-touch-icon.png” />
+    <link rel="manifest" href="/manifest.json">
+    <link rel="stylesheet" href="Prayer.css">
+</head>
+<body id="background">
+    <div class="box" style="text-align: center;">
+        <form id="form1" runat="server" method="post">
+            @using System.Data.SqlClient;
+            @using System.Data;
+            @using FHWebsite;
+            @{
+                string[] dataColumns = { "PrayerID", "UserID", "Type", "Date", "Description" };
+                SqlDbType[] dataTypes = { SqlDbType.Int, SqlDbType.SmallInt, SqlDbType.Char, SqlDbType.DateTime2, SqlDbType.NVarChar };
+                string[] userInputs = new string[5];
+                string connection = System.Configuration.ConfigurationManager.ConnectionStrings["FHConnectionString"].ConnectionString;
+                bool isValidId;
+
+                if (IsPost)
+                {
+                    // Get user inputs
+                    for (int i = 0; i < dataColumns.Length; i++)
+                    {
+                        userInputs[i] = Request.Form[dataColumns[i]];
+                    }
+
+                    // Check if the entered ID is valid
+                    isValidId = ((int)SqlTools.ExecuteScalar(connection, "SELECT COUNT(*) FROM [FH].[dbo].[Members] WHERE [ID] = @UserID", new string[] { "@UserID" }, new SqlDbType[] { SqlDbType.SmallInt }, new string[] { userInputs[1] }) > 0);
+                    userInputs[0] = ((int)(SqlTools.ExecuteScalar(connection, "SELECT MAX(PR.PrayerID) FROM [FH].[dbo].[PrayerRequests] PR", new string[] { }, new SqlDbType[] { }, new string[] { })) + 1).ToString();
+                    userInputs[3] = DateTime.Now.ToString();
+
+                    string insertCommand = @"INSERT INTO [dbo].[PrayerRequests]
+                                                             ([PrayerID],[UserID],[Type],[Date],[Description])
+                                                             VALUES (@PrayerID, @UserID, @Type, @Date, @Description)";
+
+
+                    // Provide output message
+                    if (isValidId)
+                    {
+                        if (SqlTools.ExecuteNonQuery(connection, insertCommand, dataColumns, dataTypes, userInputs) > 0)
+                        {
+                            msg = "<h3 class=\"message\">Entry submitted</h3>";
+                            description = "";
+                        }
+                        else
+                        {
+                            msg = "<h3 class=\"message\">Something went wrong</h3>";
+                            description = userInputs[4];
+                        }
+                    }
+                    else
+                    {
+                        msg = "<h3 class=\"message\">" + userInputs[1] + " is not a current User ID.</h3>";
+                        description = userInputs[4];
+                    }
+
+                }
+            }
+            <a href="index.cshtml"><h3 class="nav-button">← Back to Home</h3></a>
+            <h1>New Prayer/Praise</h1>
+            @{WriteLiteral(msg);}
+            <h3 style="text-align:center; width: 600px;">
+                User ID: <input type="text" name="userID" size="2" /><br /><br />
+                <!--<input type="checkbox" name="Anonymous" value="Anonymous">Anonymous<br /><br />-->
+                <input type="radio" name="Type" value="Prayer" checked> Prayer
+                <input type="radio" name="Type" value="Praise"> Praise<br><br />
+                Description: <br /><textarea rows="4" cols="50" name="Description">@description</textarea><br />
+                <input type="submit" name="submit" value="Submit" />
+            </h3>
+        </form>
+    </div>
+</body>
+</html>
