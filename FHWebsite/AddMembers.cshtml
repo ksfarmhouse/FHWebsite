@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 @{ string msg = "";}
 <head runat="server">
-    <title>Add/Update Menu Items</title>
+    <title>Add Members</title>
     <link rel=”apple-touch-icon” href=”/apple-touch-icon.png” />
     <!--<link rel=”apple-touch-icon-precomposed” href=”/apple-touch-icon.png”/>-->
     <link rel=”icon” href=”/apple-touch-icon.png” />
@@ -16,10 +16,11 @@
         @using System.Data;
         @using FHWebsite;
         @{
-            string[] dataColumns = { "Date", "Lunch", "Dinner" };
-            SqlDbType[] dataTypes = { SqlDbType.Date, SqlDbType.NChar, SqlDbType.NChar };
-            string[] userInputs = new string[3];
+            string[] dataColumns = { "ID", "FirstName", "LastName", "OutOfHouse" };
+            SqlDbType[] dataTypes = { SqlDbType.Int, SqlDbType.NChar, SqlDbType.NChar, SqlDbType.Bit };
+            string[] userInputs = new string[4];
             string connection = System.Configuration.ConfigurationManager.ConnectionStrings["FHConnectionString"].ConnectionString;
+            bool isUniqueId;
 
             if (IsPost)
             {
@@ -29,14 +30,23 @@
                     userInputs[i] = Request.Form[dataColumns[i]];
                 }
 
-                string insertCommand = @"UPDATE[dbo].[Menu]
-                                         SET [Lunch] = @Lunch,
-                                             [Dinner] = @Dinner
-                                         WHERE [Date] = @Date
-                                         IF @@ROWCOUNT=0
-                                         INSERT INTO [dbo].[Menu]([Date],[Lunch],[Dinner])
-                                         VALUES(@Date,@Lunch,@Dinner)";
+                if (userInputs[3] == "on")
+                {
+                    userInputs[3] = "true";
+                }
+                else {
+                    userInputs[3] = "false";
+                }
 
+            // Check if the entered ID is valid
+            isUniqueId = ((int)SqlTools.ExecuteScalar(connection, "SELECT COUNT(*) FROM [FH].[dbo].[Members] WHERE [ID] = @ID", new string[] { "@ID" }, new SqlDbType[] { SqlDbType.Int }, new string[] { userInputs[0] }) == 0);
+
+            string insertCommand = @"INSERT INTO [dbo].[Members]([ID], [FirstName], [LastName], [OutOfHouse])
+                                         VALUES(@ID, @FirstName, @LastName, @OutOfHouse)";
+
+            // Provide output message
+            if (isUniqueId)
+            {
                 if (SqlTools.ExecuteNonQuery(connection, insertCommand, dataColumns, dataTypes, userInputs) > 0)
                 {
                     msg = "<h3 class=\"message\">Entry submitted</h3>";
@@ -46,23 +56,29 @@
                     msg = "<h3 class=\"message\">Something went wrong</h3>";
                 }
             }
+            else
+            {
+                msg = "<h3 class=\"message\">" + userInputs[0] + " is not a unique User ID.</h3>";
+            }
+
+        }
         }
         <!--Navigation Bar-->
         @Html.Raw(File.ReadAllText(Server.MapPath("Header.html")))
         <div class="box">
-            <h1>Add/Update Menu Items</h1>
+            <h1>Add Members</h1>
             @{WriteLiteral(msg);}
             <p>
-                Date:&nbsp;
-                @{
-                    WriteLiteral("<input type=\"date\" name=\"date\" value=\"" + DateTime.Today.ToString("yyyy-MM-dd") + "\" />");
-                }
+                User ID:&nbsp;<input type="text" name="id" size="2" />
             </p>
             <p>
-                Lunch:&nbsp;<input type="text" name="lunch" size="50" />
+                First Name:&nbsp;<input type="text" name="firstName" size="15" />
             </p>
             <p>
-                Dinner:&nbsp;<input type="text" name="dinner" size="50" />
+                Last Name:&nbsp;<input type="text" name="lastName" size="15" />
+            </p>
+            <p>
+                Out of House:&nbsp;<input type="checkbox" name="outOfHouse"/>
             </p>
             <input type="submit" name="submit" value="Submit" />
         </div>
