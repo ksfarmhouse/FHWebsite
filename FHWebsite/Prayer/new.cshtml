@@ -17,9 +17,9 @@
             @using System.Data;
             @using FHWebsite;
             @{
-                string[] dataColumns = { "PrayerID", "UserID", "Type", "Date", "Description" };
-                SqlDbType[] dataTypes = { SqlDbType.Int, SqlDbType.SmallInt, SqlDbType.Char, SqlDbType.DateTime2, SqlDbType.NVarChar };
-                string[] userInputs = new string[5];
+                string[] dataColumns = { "UserID", "Type", "Description" };
+                SqlDbType[] dataTypes = {SqlDbType.SmallInt, SqlDbType.Char, SqlDbType.NVarChar };
+                string[] userInputs = new string[3];
                 string connection = System.Configuration.ConfigurationManager.ConnectionStrings["FHConnectionString"].ConnectionString;
                 bool isValidId;
 
@@ -31,14 +31,17 @@
                         userInputs[i] = Request.Form[dataColumns[i]];
                     }
 
+                    if (userInputs[0] == "")
+                    {
+                        userInputs[0] = "2"; //Anonymous
+                    }
+
                     // Check if the entered ID is valid
-                    isValidId = ((int)SqlTools.ExecuteScalar(connection, "SELECT COUNT(*) FROM [FH].[dbo].[Members] WHERE [ID] = @UserID", new string[] { "@UserID" }, new SqlDbType[] { SqlDbType.SmallInt }, new string[] { userInputs[1] }) > 0);
-                    userInputs[0] = ((int)(SqlTools.ExecuteScalar(connection, "SELECT MAX(PR.PrayerID) FROM [FH].[dbo].[PrayerRequests] PR", new string[] { }, new SqlDbType[] { }, new string[] { })) + 1).ToString();
-                    userInputs[3] = DateTime.Now.ToString();
+                    isValidId = ((int)SqlTools.ExecuteScalar(connection, "SELECT COUNT(*) FROM [FH].[dbo].[Members] WHERE [ID] = @UserID", new string[] { "@UserID" }, new SqlDbType[] { SqlDbType.SmallInt }, new string[] { userInputs[0] }) > 0);
 
                     string insertCommand = @"INSERT INTO [dbo].[PrayerRequests]
-                                                             ([PrayerID],[UserID],[Type],[Date],[Description])
-                                                             VALUES (@PrayerID, @UserID, @Type, @Date, @Description)";
+                                                             ([UserID],[Type],[Description])
+                                                             VALUES (@UserID, @Type, @Description)";
 
 
                     // Provide output message
@@ -67,8 +70,8 @@
             <h1>New Prayer/Praise</h1>
             @{WriteLiteral(msg);}
             <h3 style="text-align:center; width: 600px;">
-                User ID: <input type="text" name="userID" size="2" /><br /><br />
-                <!--<input type="checkbox" name="Anonymous" value="Anonymous">Anonymous<br /><br />-->
+                User ID: <input type="text" name="userID" size="2" /><br />
+                <span style="font-size:.5em">If you leave the User ID blank, it will go in as Anonymous</span><br /><br />
                 <input type="radio" name="Type" value="Prayer" checked> Prayer
                 <input type="radio" name="Type" value="Praise"> Praise<br><br />
                 Description: <br /><textarea rows="4" cols="50" name="Description">@description</textarea><br />

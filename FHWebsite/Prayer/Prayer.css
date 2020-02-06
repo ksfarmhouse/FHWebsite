@@ -40,6 +40,13 @@
     overflow: auto;
 }
 
+.answered-text {
+    font-weight: normal;
+    text-align: right;
+    font-size: 12px;
+    margin: 0;
+}
+
 .box {
     flex: 0 1 250px;
 }

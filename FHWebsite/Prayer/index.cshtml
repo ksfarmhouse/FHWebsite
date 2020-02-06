@@ -2,8 +2,8 @@
 <html>
 <head>
     <title>Prayers</title>
-    <link rel="stylesheet" href="Prayer.css" />
-    <link rel=”apple-touch-icon” href=”/AppleIcon.png” />
+    <link rel="stylesheet" href="/Prayer/Prayer.css" />
+    <link rel=”apple-touch-icon” href=”AppleIcon.png” />
     <link rel=”apple-touch-icon-precomposed” href=”/AppleIcon.png” />
     <link rel="manifest" href="/manifest.json" />
 </head>
@@ -16,44 +16,84 @@
         string connection = System.Configuration.ConfigurationManager.ConnectionStrings["FHConnectionString"].ConnectionString;
         string type = "Prayer";
         string command;
-        string[] parameters = new string[] { "@type" };
-        SqlDbType[] paramTypes = new SqlDbType[] { SqlDbType.Char };
-        string[] paramValues = new string[1];
+        string[] parameters = new string[] { "@type", "@page" };
+        SqlDbType[] paramTypes = new SqlDbType[] { SqlDbType.Char, SqlDbType.Int };
+        string[] paramValues = new string[2];
         SqlDataReader list;
         string fullList = "";
+        string page = "1";
+
+        string path = HttpContext.Current.Request.Url.AbsolutePath;
+        string[] pieces = path.Split('/');
+        int id = 0;
+        if (pieces.Length > 4)
+        {
+            if (pieces[3] == "answered" || pieces[3] == "unanswered")
+            {
+                id = Convert.ToInt32(pieces[4]);
+                if (pieces[3] == "answered")
+                {
+                    command = @"UPDATE PrayerRequests
+                                SET PrayerRequests.[Type] = 'AnsPry'
+                                WHERE Id = @id";
+                }
+                else
+                {
+                    command = @"UPDATE PrayerRequests
+                                SET PrayerRequests.[Type] = 'Prayer'
+                                WHERE Id = @id";
+                }
+                parameters = new string[] { "@id" };
+                paramTypes = new SqlDbType[] { SqlDbType.Int };
+                paramValues = new string[] { id.ToString() };
+
+                SqlTools.ExecuteQuery(connection, command, parameters, paramTypes, paramValues);
+                Response.Redirect("/Prayer/index.cshtml");
+            }
+        }
 
         if (IsPost)
         {
             paramValues = GetData(parameters);
             type = paramValues[0];
+            page = paramValues[1];
+            if (page == "" || Convert.ToInt32(page) <= 0)
+            {
+                page = "1";
+            }
+            string pageSize = "10";
 
             // Setup to pull the prayers from db
-            command = @"SELECT M.FirstName, M.LastName, PR.Date, PR.Description
-                FROM [FH].[dbo].[PrayerRequests] PR
-                    INNER JOIN [FH].[dbo].[Members] M ON M.ID = PR.UserID
-                    LEFT JOIN [FH].[dbo].[PrayerComments] PC ON PR.PrayerID = PC.PrayerID
-                WHERE PR.[Type] = @type
-                ORDER BY PR.[Date] DESC";
-            parameters = new string[] { "@type" };
-            paramTypes = new SqlDbType[] { SqlDbType.Char };
-            paramValues = new string[] { type };
+            command = @"SELECT M.FirstName, M.LastName, PR.Date, PR.Description, PR.Id
+                        FROM [FH].[dbo].[PrayerRequests] PR
+                        INNER JOIN [FH].[dbo].[Members] M ON M.ID = PR.UserID
+                        WHERE PR.[Type] = @type
+                        ORDER BY PR.[Date] DESC
+                        OFFSET (@pageSize * @page - @pageSize) ROWS
+                        FETCH NEXT @pageSize ROWS ONLY";
+            parameters = new string[] { "@type", "@page", "@pageSize" };
+            paramTypes = new SqlDbType[] { SqlDbType.Char, SqlDbType.Int, SqlDbType.Int };
+            paramValues = new string[] { type, page, pageSize };
 
             // Display the prayers
             list = SqlTools.ExecuteQuery(connection, command, parameters, paramTypes, paramValues);
-            fullList = BuildList(list);
+            fullList = BuildList(list, type);
 
         }
     }
     @functions{
-        string BuildList(SqlDataReader list)
+        string BuildList(SqlDataReader list, string type)
         {
             StringBuilder fullList = new StringBuilder();
-
 
             while (list.Read())
             {
                 fullList.Append("<div class='prayer-box'>");
-                fullList.Append("<p style='font-size:0.75em; margin-left: 0; margin-bottom: 15px;'>" + list.GetString(0) + " " + list.GetString(1) + "<br>" + list.GetDateTime(2).ToString("MMMM dd, yyyy h:mm tt") + "</p>" + list.GetString(3));
+                fullList.Append("<p style='font-size:0.75em; margin-bottom: 15px'>" + list.GetString(0) + " " + list.GetString(1) + "<br>" + list.GetDateTime(2).ToString("MMMM dd, yyyy h:mm tt") + "</p><p>" + list.GetString(3) + "</p>");
+                if (type == "Prayer")
+                    fullList.Append("<p class='answered-text'><a href='index.cshtml/answered/" + list.GetInt32(4) + "' onclick='javascript:document.submit;'>Mark Answered</a></p>");
+                else if (type == "AnsPry")
+                    fullList.Append("<p class='answered-text'><a href='index.cshtml/unanswered/" + list.GetInt32(4) + "' onclick='javascript:document.submit;'>Mark Unanswered</a></p>");
                 fullList.Append("</div>");
             }
 
@@ -76,22 +116,30 @@
             if (type == value)
                 WriteLiteral("selected");
         }
+
     }
     <div class="box">
         <form id="form1" method="post">
-            <a href="new.cshtml"><h3 class="nav-button">+ Add New</h3></a>
-                <h1>FarmHouse Prayers</h1>
-                <h3 style="text-align:center;">
-                    Type: <select name="type">
-                        <option value="Prayer" @{Selected(type, "Prayer");}>Prayers</option>
-                        <option value="Answered" @{Selected(type, "Answered");}>Answered Prayers</option>
-                        <option value="Praise" @{Selected(type, "Praise");}>Praises</option>
-                    </select>
-                    &nbsp;<input type="submit" name="submit" value="Filter" />
-                </h3>
-                @Html.Raw(fullList)
-</form>
+            <a href="/Prayer/new.cshtml"><h3 class="nav-button">+ Add New</h3></a>
+            <h1>FarmHouse Prayers</h1>
+            <h3 style="text-align:center;">
+                Type: <select name="type">
+                    <option value="Prayer" @{Selected(type, "Prayer");}>Prayers</option>
+                    <option value="AnsPry" @{Selected(type, "AnsPry");}>Answered Prayers</option>
+                    <option value="Praise" @{Selected(type, "Praise");}>Praises</option>
+                </select>
+                Page: <input type="number" name="page" size="1" min="1" value=@page />
+                &nbsp;<input type="submit" name="submit" id="filter-button" value="Filter" />
+            </h3>
+            @Html.Raw(fullList)
+        </form>
 
     </div>
 </body>
 </html>
+
+<script>
+    function ClickFilter() {
+        document.getElementById("filter-button").click();
+    }
+</script>
