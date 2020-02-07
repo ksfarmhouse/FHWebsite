@@ -71,10 +71,12 @@
             @{WriteLiteral(msg);}
             <h3 style="text-align:center; width: 600px;">
                 User ID: <input type="text" name="userID" size="2" /><br />
+                <span style="font-size:.5em">Same as your Print/Meal Code</span><br />
                 <span style="font-size:.5em">If you leave the User ID blank, it will go in as Anonymous</span><br /><br />
                 <input type="radio" name="Type" value="Prayer" checked> Prayer
                 <input type="radio" name="Type" value="Praise"> Praise<br><br />
-                Description: <br /><textarea rows="4" cols="50" name="Description">@description</textarea><br />
+                Description: <br /><textarea rows="4" cols="50" name="Description" maxlength="1000">@description</textarea><br />
+                <span style="font-size:.5em;">1000 Character Limit</span><br /><br />
                 <input type="submit" name="submit" value="Submit" />
             </h3>
         </form>

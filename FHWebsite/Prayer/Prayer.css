@@ -107,6 +107,27 @@
         font-weight: 600;
     }
 
+#navigation {
+    text-align: center;
+    padding: 10px;
+}
+
+    #navigation h3 {
+        margin: 2px;
+        text-align: center;
+        width: 100%;
+        color: #006938;
+    }
+
+    #navigation a {
+        color: #006938;
+        text-decoration: none;
+    }
+
+        #navigation a:hover {
+            color: #ffce00;
+        }
+
 .message {
     background-color: #ffce00;
     color: #54575a;

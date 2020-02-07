@@ -34,14 +34,14 @@
                 if (pieces[3] == "answered")
                 {
                     command = @"UPDATE PrayerRequests
-                                SET PrayerRequests.[Type] = 'AnsPry'
-                                WHERE Id = @id";
+                            SET PrayerRequests.[Type] = 'AnsPry'
+                            WHERE Id = @id";
                 }
                 else
                 {
                     command = @"UPDATE PrayerRequests
-                                SET PrayerRequests.[Type] = 'Prayer'
-                                WHERE Id = @id";
+                            SET PrayerRequests.[Type] = 'Prayer'
+                            WHERE Id = @id";
                 }
                 parameters = new string[] { "@id" };
                 paramTypes = new SqlDbType[] { SqlDbType.Int };
@@ -65,12 +65,12 @@
 
             // Setup to pull the prayers from db
             command = @"SELECT M.FirstName, M.LastName, PR.Date, PR.Description, PR.Id
-                        FROM [FH].[dbo].[PrayerRequests] PR
-                        INNER JOIN [FH].[dbo].[Members] M ON M.ID = PR.UserID
-                        WHERE PR.[Type] = @type
-                        ORDER BY PR.[Date] DESC
-                        OFFSET (@pageSize * @page - @pageSize) ROWS
-                        FETCH NEXT @pageSize ROWS ONLY";
+                    FROM [FH].[dbo].[PrayerRequests] PR
+                    INNER JOIN [FH].[dbo].[Members] M ON M.ID = PR.UserID
+                    WHERE PR.[Type] = @type
+                    ORDER BY PR.[Date] DESC
+                    OFFSET (@pageSize * @page - @pageSize) ROWS
+                    FETCH NEXT @pageSize ROWS ONLY";
             parameters = new string[] { "@type", "@page", "@pageSize" };
             paramTypes = new SqlDbType[] { SqlDbType.Char, SqlDbType.Int, SqlDbType.Int };
             paramValues = new string[] { type, page, pageSize };
@@ -116,8 +116,10 @@
             if (type == value)
                 WriteLiteral("selected");
         }
-
     }
+    <div class="box" id="navigation" style="padding-bottom: 10px;">
+        <h3 margin-top: 10px;"><a href="/SignUp.cshtml">Meal Website</a></h3>
+    </div>
     <div class="box">
         <form id="form1" method="post">
             <a href="/Prayer/new.cshtml"><h3 class="nav-button">+ Add New</h3></a>
@@ -137,9 +139,3 @@
     </div>
 </body>
 </html>
-
-<script>
-    function ClickFilter() {
-        document.getElementById("filter-button").click();
-    }
-</script>
