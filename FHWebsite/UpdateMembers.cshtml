@@ -43,8 +43,8 @@
                 isValidId = ((int)SqlTools.ExecuteScalar(connection, "SELECT COUNT(*) FROM [FH].[dbo].[Members] WHERE [ID] = @ID", new string[] { "@ID" }, new SqlDbType[] { SqlDbType.Int }, new string[] { userInputs[0] }) > 0);
 
                 string insertCommand = @"UPDATE[dbo].[Members]
-                                         SET [FirstName] = @FirstName,
-                                             [LastName] = @LastName,
+                                         SET [FirstName] = ISNULL(NULLIF(@FirstName,''),  FirstName),
+                                             [LastName] = ISNULL(NULLIF(@LastName,''),  LastName),
                                              [OutOfHouse] = @OutOfHouse
                                          WHERE [ID] = @ID";
 
@@ -69,6 +69,7 @@
         }
         <!--Navigation Bar-->
         @Html.Raw(File.ReadAllText(Server.MapPath("Header.html")))
+        @Html.Raw(File.ReadAllText(Server.MapPath("AddPagesHeader.html")))
         <div class="box">
             <h1>Update Members</h1>
             @{WriteLiteral(msg);}

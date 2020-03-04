@@ -34,37 +34,39 @@
                 {
                     userInputs[3] = "true";
                 }
-                else {
+                else
+                {
                     userInputs[3] = "false";
                 }
 
-            // Check if the entered ID is valid
-            isUniqueId = ((int)SqlTools.ExecuteScalar(connection, "SELECT COUNT(*) FROM [FH].[dbo].[Members] WHERE [ID] = @ID", new string[] { "@ID" }, new SqlDbType[] { SqlDbType.Int }, new string[] { userInputs[0] }) == 0);
+                // Check if the entered ID is valid
+                isUniqueId = ((int)SqlTools.ExecuteScalar(connection, "SELECT COUNT(*) FROM [FH].[dbo].[Members] WHERE [ID] = @ID", new string[] { "@ID" }, new SqlDbType[] { SqlDbType.Int }, new string[] { userInputs[0] }) == 0);
 
-            string insertCommand = @"INSERT INTO [dbo].[Members]([ID], [FirstName], [LastName], [OutOfHouse])
+                string insertCommand = @"INSERT INTO [dbo].[Members]([ID], [FirstName], [LastName], [OutOfHouse])
                                          VALUES(@ID, @FirstName, @LastName, @OutOfHouse)";
 
-            // Provide output message
-            if (isUniqueId)
-            {
-                if (SqlTools.ExecuteNonQuery(connection, insertCommand, dataColumns, dataTypes, userInputs) > 0)
+                // Provide output message
+                if (isUniqueId)
                 {
-                    msg = "<h3 class=\"message\">Entry submitted</h3>";
+                    if (SqlTools.ExecuteNonQuery(connection, insertCommand, dataColumns, dataTypes, userInputs) > 0)
+                    {
+                        msg = "<h3 class=\"message\">Entry submitted</h3>";
+                    }
+                    else
+                    {
+                        msg = "<h3 class=\"message\">Something went wrong</h3>";
+                    }
                 }
                 else
                 {
-                    msg = "<h3 class=\"message\">Something went wrong</h3>";
+                    msg = "<h3 class=\"message\">" + userInputs[0] + " is not a unique User ID.</h3>";
                 }
-            }
-            else
-            {
-                msg = "<h3 class=\"message\">" + userInputs[0] + " is not a unique User ID.</h3>";
-            }
 
-        }
+            }
         }
         <!--Navigation Bar-->
         @Html.Raw(File.ReadAllText(Server.MapPath("Header.html")))
+        @Html.Raw(File.ReadAllText(Server.MapPath("AddPagesHeader.html")))
         <div class="box">
             <h1>Add Members</h1>
             @{WriteLiteral(msg);}
@@ -78,7 +80,7 @@
                 Last Name:&nbsp;<input type="text" name="lastName" size="15" />
             </p>
             <p>
-                Out of House:&nbsp;<input type="checkbox" name="outOfHouse"/>
+                Out of House:&nbsp;<input type="checkbox" name="outOfHouse" />
             </p>
             <input type="submit" name="submit" value="Submit" />
         </div>

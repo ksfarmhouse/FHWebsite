@@ -30,8 +30,8 @@
                 }
 
                 string insertCommand = @"UPDATE[dbo].[Menu]
-                                         SET [Lunch] = @Lunch,
-                                             [Dinner] = @Dinner
+                                         SET [Lunch] = ISNULL(NULLIF(@Lunch,''),  Lunch),
+                                             [Dinner] = ISNULL(NULLIF(@Dinner,''),  Dinner)
                                          WHERE [Date] = @Date
                                          IF @@ROWCOUNT=0
                                          INSERT INTO [dbo].[Menu]([Date],[Lunch],[Dinner])
@@ -49,6 +49,7 @@
         }
         <!--Navigation Bar-->
         @Html.Raw(File.ReadAllText(Server.MapPath("Header.html")))
+        @Html.Raw(File.ReadAllText(Server.MapPath("AddPagesHeader.html")))
         <div class="box">
             <h1>Add/Update Menu Items</h1>
             @{WriteLiteral(msg);}
