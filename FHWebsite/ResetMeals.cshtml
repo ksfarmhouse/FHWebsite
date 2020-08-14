@@ -1,0 +1,49 @@
+﻿<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+@{ string msg = "";}
+<head runat="server">
+    <title>Reset Meals</title>
+    <link rel=”apple-touch-icon” href=”/apple-touch-icon.png” />
+    <!--<link rel=”apple-touch-icon-precomposed” href=”/apple-touch-icon.png”/>-->
+    <link rel=”icon” href=”/apple-touch-icon.png” />
+    <link rel="manifest" href="/manifest.json">
+    <link rel="stylesheet" href="FhStyle.css">
+</head>
+<body id="background">
+    <form id="form1" runat="server" method="post">
+        @using System.Data.SqlClient;
+        @using System.Data;
+        @using FHWebsite;
+        @{
+        string connection = System.Configuration.ConfigurationManager.ConnectionStrings["FHConnectionString"].ConnectionString;
+
+        if (IsPost)
+        {
+
+        string command = @"";
+        SqlCommand cmd = new SqlCommand(command, connection);
+
+        if (SqlCommand.ExecuteScalar(connection, command) > 0)
+        {
+        msg = "<h3 class=\"message\">Entry submitted</h3>";
+        }
+        else
+        {
+        msg = "<h3 class=\"message\">Something went wrong</h3>";
+        }
+        }
+        }
+        <!--Navigation Bar-->
+        @Html.Raw(File.ReadAllText(Server.MapPath("Header.html")))
+        @Html.Raw(File.ReadAllText(Server.MapPath("AddPagesHeader.html")))
+        <div class="box">
+            <h1>Reset Meals</h1>
+            @{WriteLiteral(msg);}
+            <input type="submit" name="RIH" value="Reset In House" />
+            <input type="submit" name="ROOH" value="Reset Out of House" />
+            <input type="submit" name="Both" value="Reset Both" />
+        </div>
+    </form>
+</body>
+</html>

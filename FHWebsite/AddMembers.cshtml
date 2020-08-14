@@ -19,6 +19,7 @@
             string[] dataColumns = { "ID", "FirstName", "LastName", "OutOfHouse" };
             SqlDbType[] dataTypes = { SqlDbType.Int, SqlDbType.NChar, SqlDbType.NChar, SqlDbType.Bit };
             string[] userInputs = new string[4];
+
             string connection = System.Configuration.ConfigurationManager.ConnectionStrings["FHConnectionString"].ConnectionString;
             bool isUniqueId;
 
@@ -45,16 +46,36 @@
                 string insertCommand = @"INSERT INTO [dbo].[Members]([ID], [FirstName], [LastName], [OutOfHouse])
                                          VALUES(@ID, @FirstName, @LastName, @OutOfHouse)";
 
+                string insertCommand2;
+
+                if (userInputs[3] == "false")
+                {
+                    insertCommand2 = @"INSERT INTO [dbo].[WeeklyMeals]
+                                       VALUES(@ID, 'LI', 'DI', 'LI', 'DI', 'LI', 'DI', 'LI', 'DI', 'LI', 'DI')";
+                }
+                else
+                {
+                    insertCommand2 = @"INSERT INTO [dbo].[WeeklyMeals]
+                                       VALUES(@ID, 'LO', 'DO', 'LO', 'DO', 'LO', 'DO', 'LO', 'DO', 'LO', 'DO')";
+                }
+
                 // Provide output message
                 if (isUniqueId)
                 {
                     if (SqlTools.ExecuteNonQuery(connection, insertCommand, dataColumns, dataTypes, userInputs) > 0)
                     {
-                        msg = "<h3 class=\"message\">Entry submitted</h3>";
+                        if (SqlTools.ExecuteNonQuery(connection, insertCommand2, dataColumns, dataTypes, userInputs) > 0)
+                        {
+                            msg = "<h3 class=\"message\">Entry submitted</h3>";
+                        }
+                        else
+                        {
+                            msg = "<h3 class=\"message\">Something went wrong inserting into Weekly Meals</h3>";
+                        }
                     }
                     else
                     {
-                        msg = "<h3 class=\"message\">Something went wrong</h3>";
+                        msg = "<h3 class=\"message\">Something went wrong inserting into Members</h3>";
                     }
                 }
                 else
