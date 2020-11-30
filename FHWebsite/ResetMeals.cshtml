@@ -16,23 +16,25 @@
         @using System.Data;
         @using FHWebsite;
         @{
-        string connection = System.Configuration.ConfigurationManager.ConnectionStrings["FHConnectionString"].ConnectionString;
+            string[] dataColumns = { "1" };
+            SqlDbType[] dataTypes = { SqlDbType.Int };
+            string[] userInputs = new string[1];
+            string connection = System.Configuration.ConfigurationManager.ConnectionStrings["FHConnectionString"].ConnectionString;
 
-        if (IsPost)
-        {
+            if (IsPost)
+            {
 
-        string command = @"";
-        SqlCommand cmd = new SqlCommand(command, connection);
+                string command = @"SELECT * FROM Menu";
 
-        if (SqlCommand.ExecuteScalar(connection, command) > 0)
-        {
-        msg = "<h3 class=\"message\">Entry submitted</h3>";
-        }
-        else
-        {
-        msg = "<h3 class=\"message\">Something went wrong</h3>";
-        }
-        }
+                if (SqlTools.ExecuteNonQuery(connection, command, dataColumns, dataTypes, userInputs) > 0)
+                {
+                    msg = "<h3 class=\"message\">Meals Reset</h3>";
+                }
+                else
+                {
+                    msg = "<h3 class=\"message\">Something went wrong</h3>";
+                }
+            }
         }
         <!--Navigation Bar-->
         @Html.Raw(File.ReadAllText(Server.MapPath("Header.html")))
