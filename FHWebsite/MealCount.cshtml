@@ -12,40 +12,44 @@
     @using System.Data;
     @using FHWebsite;
     @using System.Text;
-    @{ 
+    @{
         string connection = System.Configuration.ConfigurationManager.ConnectionStrings["FHConnectionString"].ConnectionString;
         SqlDataReader mealCount;
-        string[] parameters = new string[] {"@Start", "@End"};
-        SqlDbType[] paramTypes = new SqlDbType[] {SqlDbType.Date, SqlDbType.Date};
-        string[] paramValues = new string[] {DateTime.Today.AddMonths(-1).ToString("yyyy-MM-dd"), DateTime.Today.ToString("yyyy-MM-dd")};
+        string start = DateTime.Today.AddMonths(-1).ToString("yyyy-MM-dd");
+        string end = DateTime.Today.ToString("yyyy-MM-dd");
+        string[] parameters = new string[] { "@Start", "@End" };
+        SqlDbType[] paramTypes = new SqlDbType[] { SqlDbType.Date, SqlDbType.Date };
+        string[] paramValues = new string[] { DateTime.Today.AddMonths(-1).ToString("yyyy-MM-dd"), DateTime.Today.ToString("yyyy-MM-dd") };
         string command;
 
         command = @"SELECT [FirstName]
-	                    ,[LastName]
-                        ,SUM(CASE 
-                             WHEN (OutOfHouse = 0) OR (OutOfHouse IS NULL) OR DATENAME(weekday, Date) = 'Wednesday'
-                                 THEN DQty - 1
-                             WHEN Dinner = 'DL' OR Dinner = 'DN' OR Dinner = 'DE' OR Dinner = 'DI'
-                                 THEN DQty
-                             ELSE 0 END) AS DinnerCount
-	                    ,SUM(CASE
-                             WHEN (OutOfHouse = 0) OR (OutOfHouse IS NULL)
-                                 THEN LQty - 1
-                             WHEN Lunch = 'LL' OR Lunch = 'LN' OR Lunch = 'LE' OR Lunch = 'LI'
-                                 THEN LQty
-                             ELSE 0 END) AS LunchCount
-                    FROM [dbo].[Meals] LEFT JOIN [dbo].[Members] 
-                    ON [dbo].[Meals].UserID = [dbo].[Members].ID
-                    WHERE (Date >= @Start AND Date <= @End) AND (OutOfHouse = 0 OR NOT Dinner = '' OR NOT Lunch = '')
-                    GROUP BY [FirstName], [LastName]
-                    ORDER BY [LastName], [FirstName]";
+                    ,[LastName]
+                    ,SUM(CASE
+                         WHEN (OutOfHouse = 0) OR (OutOfHouse IS NULL) OR DATENAME(weekday, Date) = 'Wednesday'
+                             THEN DQty - 1
+                         WHEN Dinner = 'DL' OR Dinner = 'DN' OR Dinner = 'DE' OR Dinner = 'DI'
+                             THEN DQty
+                         ELSE 0 END) AS DinnerCount
+                    ,SUM(CASE
+                         WHEN (OutOfHouse = 0) OR (OutOfHouse IS NULL)
+                             THEN LQty - 1
+                         WHEN Lunch = 'LL' OR Lunch = 'LN' OR Lunch = 'LE' OR Lunch = 'LI'
+                             THEN LQty
+                         ELSE 0 END) AS LunchCount
+                FROM [dbo].[Meals] LEFT JOIN [dbo].[Members]
+                ON [dbo].[Meals].UserID = [dbo].[Members].ID
+                WHERE (Date >= @Start AND Date <= @End) AND (OutOfHouse = 0 OR NOT Dinner = '' OR NOT Lunch = '')
+                GROUP BY [FirstName], [LastName]
+                ORDER BY [LastName], [FirstName]";
 
         // Update the date range
         if (IsPost)
         {
-            for(int i=0; i<parameters.Length;i++)
+            for (int i = 0; i < parameters.Length; i++)
             {
                 paramValues[i] = Request.Form[parameters[i].Substring(1)];
+                start = paramValues[0];
+                end = paramValues[1];
             }
         }
         // Get counts from the database
@@ -64,8 +68,8 @@
             StringBuilder ret = new StringBuilder();
             while (data.Read())
             {
-		if (data.GetValue(2).ToString() != "0" || data.GetValue(3).ToString() != "0")
-                	ret.AppendFormat("<tr><td>{1}</td><td>{0}</td><td>{2}</td><td>{3}</td></tr>", data.GetValue(0), data.GetValue(1), data.GetValue(2), data.GetValue(3));
+                if (data.GetValue(2).ToString() != "0" || data.GetValue(3).ToString() != "0")
+                    ret.AppendFormat("<tr><td>{1}</td><td>{0}</td><td>{2}</td><td>{3}</td></tr>", data.GetValue(0), data.GetValue(1), data.GetValue(2), data.GetValue(3));
             }
             return ret.ToString();
         }
@@ -79,21 +83,26 @@
             <h3>
                 Date Range:&nbsp;
                 @{
-                    WriteLiteral("<input type=\"date\" name=\"Start\" value=\"" + DateTime.Today.AddMonths(-1).ToString("yyyy-MM-dd") + "\" />");
+                    WriteLiteral("<input type=\"date\" name=\"Start\" value=\"" + start + "\" />");
                 }
                 &nbsp;
                 @{
-                    WriteLiteral("<input type=\"date\" name=\"End\" value=\"" + DateTime.Today.ToString("yyyy-MM-dd") + "\" />");
+                    WriteLiteral("<input type=\"date\" name=\"End\" value=\"" + end + "\" />");
                 }
                 <br />
-                <input type="submit" name="submit" value="Change Date" style="margin: 10px;"/>
+                <input type="submit" name="submit" value="Change Date" style="margin: 10px;" />
             </h3>
             <h1>Meal Count by Member:</h1>
-            <p>These meals are calculated as any meals for an Out-of-House member,<br />excluding Wednesday Dinner,<br />
-            and any guests brought by an In-House Member</p>
+            <p>
+                These meals are calculated as any meals for an Out-of-House member,<br />excluding Wednesday Dinner,<br />
+                and any guests brought by an In-House Member
+            </p>
             <table>
                 <tr>
-                    <th>Last Name</th><th>First Name</th><th>Dinners</th><th>Lunches</th>
+                    <th>Last Name</th>
+                    <th>First Name</th>
+                    <th>Dinners</th>
+                    <th>Lunches</th>
                 </tr>
                 @{ WriteLiteral(FormatData(mealCount));}
             </table>
