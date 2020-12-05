@@ -143,6 +143,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="About.aspx" />
+    <Content Include="AddPagesHeader.html" />
     <Content Include="Contact.aspx" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
@@ -180,6 +181,7 @@
     <Content Include="Prayer\index.cshtml" />
     <Content Include="Menu.cshtml" />
     <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
+    <Content Include="ResetMeals.cshtml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Meals.aspx" />
     <Content Include="Prayer\Prayer.css" />

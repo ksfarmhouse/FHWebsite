@@ -1,7 +1,7 @@
 ﻿<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
-@{ string msg = "";}
+@{ string msg = ""; string msg2 = ""; }
 <head runat="server">
     <title>Reset Meals</title>
     <link rel=”apple-touch-icon” href=”/apple-touch-icon.png” />
@@ -16,35 +16,65 @@
         @using System.Data;
         @using FHWebsite;
         @{
-            string[] dataColumns = { "1" };
-            SqlDbType[] dataTypes = { SqlDbType.Int };
-            string[] userInputs = new string[1];
+            string[] dataColumns = { "0", "1" };
+            SqlDbType[] dataTypes = { SqlDbType.Int, SqlDbType.Int };
+            string[] userInputs = { "0", "1" };
             string connection = System.Configuration.ConfigurationManager.ConnectionStrings["FHConnectionString"].ConnectionString;
 
             if (IsPost)
             {
 
-                string command = @"SELECT * FROM Menu";
+                string command_ih = @"
+                            --Reset Weekly Meals for In House
+                            Update WeeklyMeals
+                            SET
+                            [MonLunch] = 'LI', [MonDinner] = 'DI',
+                            [TueLunch] = 'LI', [TueDinner] = 'DI',
+                            [WedLunch] = 'LI', [WedDinner] = 'DI',
+                            [ThuLunch] = 'LI', [ThuDinner] = 'DI',
+                            [FriLunch] = 'LI', [FriDinner] = 'DI'
+                            FROM WeeklyMeals LEFT JOIN Members ON WeeklyMeals.UserID = Members.ID
+                            WHERE Members.OutOfHouse = @0";
 
-                if (SqlTools.ExecuteNonQuery(connection, command, dataColumns, dataTypes, userInputs) > 0)
+                string command_ooh = @"
+                            -- Reset Weekly Meals for Out of House
+                            Update WeeklyMeals
+                            SET
+                            [MonLunch] = 'LO', [MonDinner] = 'DO',
+                            [TueLunch] = 'LO', [TueDinner] = 'DO',
+                            [WedLunch] = 'LO', [WedDinner] = 'DO',
+                            [ThuLunch] = 'LO', [ThuDinner] = 'DO',
+                            [FriLunch] = 'LO', [FriDinner] = 'DO'
+                            FROM WeeklyMeals LEFT JOIN Members ON WeeklyMeals.UserID = Members.ID
+                            WHERE Members.OutOfHouse = @1;";
+
+                if (SqlTools.ExecuteNonQuery(connection, command_ih, dataColumns, dataTypes, userInputs) > 0)
                 {
-                    msg = "<h3 class=\"message\">Meals Reset</h3>";
+                    msg = "<h3 class=\"message\" style=\"margin-bottom: 0;\">In House Meals Reset</h3>";
                 }
                 else
                 {
-                    msg = "<h3 class=\"message\">Something went wrong</h3>";
+                    msg = "<h3 class=\"message\">Something went wrong with In House Meals Reset</h3>";
+                }
+
+                if (SqlTools.ExecuteNonQuery(connection, command_ooh, dataColumns, dataTypes, userInputs) > 0)
+                {
+                    msg2 = "<h3 class=\"message\">Out of House Meals Reset</h3>";
+                }
+                else
+                {
+                    msg2 = "<h3 class=\"message\">Something went wrong with Out of House Meals Reset</h3>";
                 }
             }
         }
         <!--Navigation Bar-->
         @Html.Raw(File.ReadAllText(Server.MapPath("Header.html")))
         @Html.Raw(File.ReadAllText(Server.MapPath("AddPagesHeader.html")))
-        <div class="box">
+        <div class="box" style="text-align: center;">
             <h1>Reset Meals</h1>
             @{WriteLiteral(msg);}
-            <input type="submit" name="RIH" value="Reset In House" />
-            <input type="submit" name="ROOH" value="Reset Out of House" />
-            <input type="submit" name="Both" value="Reset Both" />
+            @{WriteLiteral(msg2);}
+            <input type="submit" name="Reset" value="Reset Meals" style="margin: auto;" />
         </div>
     </form>
 </body>
