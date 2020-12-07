@@ -180,6 +180,7 @@
     <Content Include="Prayer\new.cshtml" />
     <Content Include="Prayer\index.cshtml" />
     <Content Include="Menu.cshtml" />
+    <Content Include="MemberMeals.cshtml" />
     <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
     <Content Include="ResetMeals.cshtml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />

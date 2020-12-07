@@ -1,0 +1,166 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Meals by Member</title>
+    <link rel="stylesheet" href="FHStyle.css" />
+    <link rel=”apple-touch-icon” href=”/img/AppleIcon.png” />
+    <link rel=”apple-touch-icon-precomposed” href=”/img/AppleIcon.png” />
+    <link rel="manifest" href="/manifest.json" />
+</head>
+<body id="background">
+    @using System.Data.SqlClient;
+    @using System.Data;
+    @using FHWebsite;
+    @using System.Text;
+    @{
+        // Future use: be able to click on a user fromthe treasure page
+        // to link to this page with params
+        /*string path = HttpContext.Current.Request.Url.Query;
+        string[] pathParams = path.Split('?');*/
+
+        string connection = System.Configuration.ConfigurationManager.ConnectionStrings["FHConnectionString"].ConnectionString;
+        SqlDataReader mealCount;
+        string userSelect = "0";
+        string start = DateTime.Today.AddMonths(-1).ToString("yyyy-MM-dd");
+        string end = DateTime.Today.ToString("yyyy-MM-dd");
+
+        /*if (pathParams.Length > 1)
+        {
+            pathParams = pathParams[1].Split(';');
+            start = pathParams[0];
+            end = pathParams[1];
+            userSelect = pathParams[2];
+
+        }*/
+
+
+        string[] parameters = new string[] { "@User", "@Start", "@End" };
+        SqlDbType[] paramTypes = new SqlDbType[] { SqlDbType.VarChar, SqlDbType.Date, SqlDbType.Date };
+        string[] paramValues = new string[] { userSelect, start, end };
+        string command;
+
+        List<string[]> users = getUsers(connection);
+
+        command = @"SELECT [Date], [Lunch], [LQty], [Dinner], [DQty]
+        FROM [dbo].[Meals]
+        WHERE (Date >= @Start AND Date <= @End) AND UserID = @User
+        ORDER BY Date";
+
+        // Update the date range
+        if (IsPost)
+        {
+            for (int i = 0; i < parameters.Length; i++)
+            {
+                paramValues[i] = Request.Form[parameters[i].Substring(1)];
+                userSelect = paramValues[0];
+                start = paramValues[1];
+                end = paramValues[2];
+            }
+        }
+        // Get counts from the database
+        mealCount = SqlTools.ExecuteQuery(connection, command, parameters, paramTypes, paramValues);
+
+
+
+    }
+    @functions{
+        List<string[]> getUsers(string connection)
+        {
+            SqlConnection con = new SqlConnection(connection);
+            con.Open();
+
+            string query = String.Format(@"SELECT * FROM Members WHERE Members.ID <> 1 AND Members.ID <> 2 ORDER BY Members.LastName");
+            SqlCommand cmd = new SqlCommand(query, con);
+            SqlDataReader reader = cmd.ExecuteReader();
+
+            List<string[]> users = new List<string[]>();
+            while (reader.Read())
+            {
+                string[] tmp = new string[4];
+                for (int i = 0; i < reader.FieldCount; i++)
+                {
+                    tmp[i] = reader.GetValue(i).ToString();
+                }
+                users.Add(tmp);
+            }
+            con.Close();
+            return users;
+        }
+
+        string UserSelected(string userId, string selectedUser)
+        {
+            if (userId == selectedUser)
+                return " selected";
+            else
+                return "";
+        }
+
+        /// <summary>
+        /// Write data to a table
+        /// </summary>
+        /// <param name="data">Data to write</param>
+        string FormatData(SqlDataReader data)
+        {
+            StringBuilder ret = new StringBuilder();
+            while (data.Read())
+            {
+                ret.AppendFormat("<tr><td>{0}</td><td style=\"text-align: center; \">{1}</td><td style=\"text-align: center; \">{2}</td style=\"text-align: center; \"><td style=\"text-align: center; \">{3}</td><td style=\"text-align: center; \">{4}</td></tr>", data.GetValue(0).ToString().Substring(0, 10), FormatLunchAndDinner(data.GetValue(1).ToString()), data.GetValue(2), FormatLunchAndDinner(data.GetValue(3).ToString()), data.GetValue(4));
+            }
+            return ret.ToString();
+        }
+
+        string FormatLunchAndDinner(string str)
+        {
+            switch (str)
+            {
+                case "LI": case "DI": return "In";
+                case "LO": case "DO": return "Out";
+                case "LL": case "DL": return "Late";
+                case "LE": case "DE": return "Early";
+                default: return "Unknown";
+            }
+        }
+    }
+
+    <!--Navigation Bar-->
+    @Html.Raw(File.ReadAllText(Server.MapPath("Header.html")))
+
+    <div class="box">
+        <form style="width:100%;text-align:center;" id="form1" runat="server" method="post">
+            <h3>
+                User:&nbsp;
+                @{
+                    WriteLiteral("<select name=\"User\" /><option value=0>Select One</option>");
+                    foreach (string[] user in users)
+                    {
+                        WriteLiteral("<option value=" + user[0] + UserSelected(user[0], userSelect) + ">" + user[1] + " " + user[2] + "</option>");
+                    }
+                    WriteLiteral("</select>");
+                }
+                <br /><br />
+                Date Range:&nbsp;
+                @{
+                    WriteLiteral("<input type=\"date\" name=\"Start\" value=\"" + start + "\" />");
+                }
+                &nbsp;
+                @{
+                    WriteLiteral("<input type=\"date\" name=\"End\" value=\"" + end + "\" />");
+                }
+                <br />
+                <input type="submit" name="submit" value="Submit" style="margin: 10px;" />
+            </h3>
+            <h1>Meals by Member:</h1>
+            <table>
+                <tr>
+                    <th>Date</th>
+                    <th>Lunch</th>
+                    <th>Number</th>
+                    <th>Dinner</th>
+                    <th>Number</th>
+                </tr>
+                @{ WriteLiteral(FormatData(mealCount));}
+            </table>
+        </form>
+    </div>
+</body>
+</html>
